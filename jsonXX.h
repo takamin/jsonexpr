@@ -110,6 +110,8 @@ namespace jsonXX {
     inline bool operator !=(const Data& data1, const std::string& data2) { return (const std::string&)data1 != data2; }
     inline bool operator !=(const std::string& data2, const Data& data1) { return (const std::string&)data1 != data2; }
 
+    class DataProxy;
+
     class Value : public Data {
         public:
             Value() : value("") {}
@@ -263,6 +265,33 @@ namespace jsonXX {
             }
         private:
             std::map<std::string, Data*> value;
+    };
+
+    class DataProxy {
+        public:
+            DataProxy() : entity(new Value()) {}
+            virtual ~DataProxy() { delete entity; }
+            DataProxy& operator = (double value) { assign(new Value(value)); return *this; }
+            DataProxy& operator = (const char* value) { assign(new Value(value)); return *this; }
+            DataProxy& operator = (const std::string& value) { assign(new Value(value)); return *this; }
+            DataProxy& operator = (const Value& value) { assign(value.clone()); return *this; }
+            DataProxy& operator = (const Array& value) { assign(value.clone()); return *this; }
+            DataProxy& operator = (const Object& value) { assign(value.clone()); return *this; }
+            operator const Value& () const {return *(Value*)entity; }
+            operator const Array& () const {return *(Array*)entity; }
+            operator const Object& () const {return *(Object*)entity; }
+            operator Value& () {return *(Value*)entity; }
+            operator Array& () {return *(Array*)entity; }
+            operator Object& () {return *(Object*)entity; }
+            //DataProxy& operator [](int index) { entity->operator[](index); }
+            //DataProxy& operator [](int index) { entity->operator[](index); }
+        private:
+            void assign(Data* entity) {
+                delete this->entity;
+                this->entity = entity;
+            }
+        private:
+            Data* entity;
     };
 }
 
