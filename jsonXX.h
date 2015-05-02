@@ -3,6 +3,7 @@
 
 #include <string>
 #include <string.h>
+#include <iostream>
 #include <sstream>
 #include <vector>
 #include <map>
@@ -35,6 +36,10 @@ namespace jsonXX {
             const Var& operator [](const std::string& key) const;
         private:
             void assign(Data* entity);
+        public:
+            void parse(std::istream& in);
+        private:
+            void parse(istream& is, parser_state_t state);
         private:
             Data* entity;
     };

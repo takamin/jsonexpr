@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 2.8)
 project( jsonXX )
 set(LIB_SOURCES
     jsonXX.cpp
+    parser.cpp
     )
 set(TEST_SOURCES
     test/test.cpp
