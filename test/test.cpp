@@ -171,6 +171,44 @@ int main(int argc, char* argv[]) {
         ASSERT_NE(strstr(ss.str().c_str(),"\"object\":{\"subobj\":-2.2}"), 0); 
     }
 
+    {
+        //change the element by assignment operator
+        jsonXX::Array obj2;
+
+        obj2.push(jsonXX::Value(1.0));
+        obj2[0] = "ABC";
+        ASSERT_EQ(obj2[0], "ABC");
+
+        obj2.push(jsonXX::Value("AAA"));
+        obj2[1] = jsonXX::Value(2.3);
+        ASSERT_EQ(obj2[1], 2.3);
+    }
+    {
+        //change the associated value
+        jsonXX::Object obj2;
+        obj2.set("A", jsonXX::Value(3.0));
+        obj2["A"] = jsonXX::Value(1.0);
+        ASSERT_EQ(obj2["A"], 1.0);
+
+        obj2.set("B", jsonXX::Value("4.0"));
+        obj2["B"] = 2.0;
+        ASSERT_EQ(obj2["B"], 2.0);
+    }
+    {
+        jsonXX::Array array;
+        array.push(jsonXX::Value(1.0));
+        array.push(jsonXX::Value("2.0"));
+        array.push(jsonXX::Value(3.0));
+        array.push(jsonXX::Value("4.0"));
+
+        jsonXX::Object object;
+        object.set("C", array);
+
+        jsonXX::Object obj2;
+        obj2.set("D", array);
+        obj2["D"] = object;
+        ASSERT_EQ(obj2["D"]["C"][3], string("4.0"));
+    }
 
     report();
     return (count_fail > 0) ? -1 : 0;
