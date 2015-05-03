@@ -67,4 +67,14 @@ namespace jsonXX {
     {
         return this->entity->operator[](key);
     }
+    std::ostream& operator << (std::ostream& os, const Var& var)
+    {
+        var.getEntity()->writeJson(os);
+        return os;
+    }
+    std::istream& operator >> (std::istream& is, Var& var)
+    {
+        var.parse(is);
+        return is;
+    }
 }

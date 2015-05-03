@@ -37,12 +37,19 @@ namespace jsonXX {
         private:
             void assign(Data* entity);
         public:
-            void parse(std::istream& in);
+            void parse(std::istream& is);
         private:
-            void parse(istream& is, parser_state_t state);
+            void parseObject(std::istream& is);
+            void parseObjectKey(std::istream& is);
+            void parseArray(std::istream& is);
+            void parseIdentifier(std::istream& is);
+            void parseString(std::istream& is);
+            void parseNumber(std::istream& is);
         private:
             Data* entity;
     };
+    std::ostream& operator << (std::ostream& os, const Var& var);
+    std::istream& operator >> (std::istream& is, Var& var);
 
     //
     // class Data

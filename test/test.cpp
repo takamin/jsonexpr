@@ -31,12 +31,14 @@ bool assert_true(bool b, const char* test_name) {
 
 #define ASSERT_EQ(A,B) {\
         if(!assert_true(((A) == (B)), #A " == " #B)) {\
+            std::cerr << "    at " << __FILE__ << "(" << __LINE__ << "):" << endl;\
             std::cerr << "    LValue: " << (A) << std::endl;\
             std::cerr << "    RValue: " << (B) << std::endl;\
         }\
     }
 #define ASSERT_NE(A,B) {\
         if(!assert_true(((A) != (B)), #A " != " #B)) {\
+            std::cerr << "    at " << __FILE__ << "(" << __LINE__ << "):" << endl;\
             std::cerr << "    LValue: " << (A) << std::endl;\
             std::cerr << "    RValue: " << (B) << std::endl;\
         }\
@@ -210,6 +212,238 @@ int main(int argc, char* argv[]) {
         ASSERT_EQ(obj2["D"]["C"][3], string("4.0"));
     }
 
+    {
+        // Var::parse string
+        jsonXX::Var obj;
+        istringstream ss("\"json\"");
+        obj.parse(ss);
+        ASSERT_EQ((const string&)obj, string("json"));
+    }
+    {
+        // Var::parse string
+        jsonXX::Var obj;
+        istringstream ss("'json'");
+        obj.parse(ss);
+        ASSERT_EQ((const string&)obj, string("json"));
+    }
+    {
+        // Var::parse string
+        jsonXX::Var obj;
+        istringstream ss("\"\\\"json\\\"\"");
+        obj.parse(ss);
+        ASSERT_EQ((const string&)obj, string("\"json\""));
+    }
+    {
+        // Var::parse string
+        jsonXX::Var obj;
+        istringstream ss("\"'json'\"");
+        obj.parse(ss);
+        ASSERT_EQ((const string&)obj, string("'json'"));
+    }
+    {
+        // Var::parse string
+        jsonXX::Var obj;
+        istringstream ss("'\"json\"'");
+        obj.parse(ss);
+        ASSERT_EQ((const string&)obj, string("\"json\""));
+    }
+    {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("1");
+        obj.parse(ss);
+        ASSERT_EQ(obj, 1.0);
+    }
+    {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("1.12345");
+        obj.parse(ss);
+        ASSERT_EQ(obj, 1.12345);
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss(".0");
+        obj.parse(ss);
+        ASSERT_EQ(obj, 0.0);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("0.");
+        obj.parse(ss);
+        ASSERT_EQ(obj, 0.0);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("+1.2E-6");
+        obj.parse(ss);
+        ASSERT_EQ(obj, 1.2E-6);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("-1.2e6");
+        obj.parse(ss);
+        ASSERT_EQ(obj, -1.2e6);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("-1.2E+6");
+        obj.parse(ss);
+        ASSERT_EQ(obj, -1.2E+6);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("0xef01");
+        obj.parse(ss);
+        ASSERT_EQ(obj, (double)0xef01);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("-0x89AB");
+        obj.parse(ss);
+        ASSERT_EQ(obj, (double)-0x89AB);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("0123");
+        obj.parse(ss);
+        ASSERT_EQ(obj, (double)0123);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss("-0670");
+        obj.parse(ss);
+        ASSERT_EQ(obj, (double)-0670);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse array
+        jsonXX::Var obj;
+        istringstream ss("[0,1,2,3]");
+        obj.parse(ss);
+        ASSERT_EQ(obj[0], 0.0);
+        ASSERT_EQ(obj[1], 1.0);
+        ASSERT_EQ(obj[2], 2.0);
+        ASSERT_EQ(obj[3], 3.0);
+        ASSERT_EQ(obj.getEntity()->size(), 4);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse object
+        jsonXX::Var obj;
+        istringstream ss("{key:'value'}");
+        obj.parse(ss);
+        ASSERT_EQ(obj["key"], string("value"));
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse object
+        jsonXX::Var obj;
+        istringstream ss("{\"key\":'value'}");
+        obj.parse(ss);
+        ASSERT_EQ(obj["key"], string("value"));
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse object
+        jsonXX::Var obj;
+        istringstream ss("{'key':'value'}");
+        obj.parse(ss);
+        ASSERT_EQ(obj["key"], string("value"));
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse array
+        jsonXX::Var obj;
+        istringstream ss("[0,'No.1',-2e2,{'last':'element',},]");
+        obj.parse(ss);
+        ASSERT_EQ(obj.getEntity()->size(), 4);
+        ASSERT_EQ(obj[0], 0.0);
+        ASSERT_EQ(obj[1], "No.1");
+        ASSERT_EQ(obj[2], -2e2);
+        ASSERT_EQ(obj[3]["last"], string("element"));
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse number
+        jsonXX::Var obj;
+        istringstream ss(" { \"array\" : [0,1,2] , 'number key' : 1.23  } ");
+        obj.parse(ss);
+        ASSERT_EQ(obj["array"][0], 0.0);
+        ASSERT_EQ(obj["array"][1], 1.0);
+        ASSERT_EQ(obj["array"][2], 2.0);
+        ASSERT_EQ(obj["number key"], 1.23);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse array
+        jsonXX::Var obj;
+        istringstream ss("[0,'No.1',-2e2,{'last':'element',},]");
+        ss >> obj;
+
+        stringstream ss2;
+        ss2 << obj;
+
+        jsonXX::Var obj2;
+        ss2 >> obj2;
+        ASSERT_EQ(obj2.getEntity()->size(), 4);
+        ASSERT_EQ(obj2[0], 0.0);
+        ASSERT_EQ(obj2[1], "No.1");
+        ASSERT_EQ(obj2[2], -2e2);
+        ASSERT_EQ(obj2[3]["last"], string("element"));
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        // Var::parse object
+        jsonXX::Var obj;
+        istringstream ss(" { \"array\" : [0,1,2] , 'number key' : 1.23  } ");
+        ss >> obj;
+
+        stringstream ss2;
+        ss2 << obj;
+
+        jsonXX::Var obj2;
+        ss2 >> obj2;
+        ASSERT_EQ(obj2["array"][0], 0.0);
+        ASSERT_EQ(obj2["array"][1], 1.0);
+        ASSERT_EQ(obj2["array"][2], 2.0);
+        ASSERT_EQ(obj2["number key"], 1.23);
+    } catch (invalid_argument& e) {
+        cerr << e.what() << endl;
+    }
     report();
     return (count_fail > 0) ? -1 : 0;
 }
