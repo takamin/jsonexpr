@@ -1,5 +1,7 @@
+#include <sstream>
 #include "jsonXX.h"
 namespace jsonXX {
+    using namespace std;
     Var Var::Null;
     Value Null;
 
@@ -9,6 +11,12 @@ namespace jsonXX {
     Var::Var()
         : entity(new Value())
     {
+    }
+    Var::Var(const std::string& json)
+        : entity(new Value())
+    {
+        istringstream ss(json);
+        ss >> *this;
     }
     Var::~Var()
     {
@@ -22,6 +30,11 @@ namespace jsonXX {
     {
         delete this->entity;
         this->entity = entity;
+    }
+    Var& Var::operator = (const Var& var)
+    {
+        this->assign(var.entity->clone());
+        return *this;
     }
     Var& Var::operator = (double value)
     {
@@ -61,6 +74,13 @@ namespace jsonXX {
     }
     Var& Var::operator [](const std::string& key)
     {
+        if(this->entity->getType() != Data::TypeObject) {
+            this->assign(new Object());
+        }
+        if(!this->entity->exists(key)) {
+            Value empty("");
+            this->entity->set(key, empty);
+        }
         return this->entity->operator[](key);
     }
     const Var& Var::operator [](const std::string& key) const

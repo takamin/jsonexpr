@@ -20,12 +20,14 @@ namespace jsonXX {
             static Var Null;
         public:
             Var();
+            Var(const std::string& json);
             virtual ~Var();
             void setEntity(const Data* entity);
             Data* getEntity() { return entity; }
             const Data* getEntity() const { return entity; }
             operator double() const;
             operator const std::string&() const;
+            Var& operator = (const Var& var);
             Var& operator = (double value);
             Var& operator = (const char* value);
             Var& operator = (const std::string& value);
@@ -57,7 +59,13 @@ namespace jsonXX {
     class Data {
         friend class Var;
         public:
-            enum Type { TypeNull, TypeInteger, TypeDouble, TypeString, TypeArray, TypeObject, };
+            enum Type {
+                TypeNull = 0,
+                TypeInteger = 1,
+                TypeDouble = 2,
+                TypeString = 3,
+                TypeArray = 4,
+                TypeObject = 5, };
             Data() : type(TypeNull) { }
             Data(const Data& that) : type(that.type) { }
             virtual ~Data() {}
@@ -126,6 +134,7 @@ namespace jsonXX {
         protected:
             Data(Type type) : type(type) { }
             void setType(Type type) { this->type = type; }
+        public:
             Type getType() const { return this->type; }
         private:
             Type type;
@@ -157,7 +166,7 @@ namespace jsonXX {
 
     class Value : public Data {
         public:
-            Value() : value("") {}
+            Value() : Data(TypeNull), value("") {}
             Value(const Value& that) : Data(that.getType()), value(that.value) { }
             Value(double value) : Data(Data::TypeDouble), value(Value::num2str(value)) { }
             Value(const std::string& value) : Data(Data::TypeString), value(value) { }

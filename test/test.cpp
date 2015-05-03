@@ -444,6 +444,54 @@ int main(int argc, char* argv[]) {
     } catch (invalid_argument& e) {
         cerr << e.what() << endl;
     }
+    {
+        jsonXX::Var var;
+        jsonXX::Object object2;
+        var.setEntity(&object);
+
+        jsonXX::Object object;
+        jsonXX::Value empty;
+        object2.set(string("A"), empty);
+        var.getEntity()->set("A", object2);
+
+        jsonXX::Var& var2 = var.getEntity()->operator[]("A");
+        ASSERT_EQ(var2.getEntity()->getType(), jsonXX::Data::TypeObject);
+    }
+    {
+        jsonXX::Var var;
+        var["a"] = 1.0;
+        var["b"] = "AAA";
+        ASSERT_EQ(var["a"], 1.0);
+        ASSERT_EQ(var["b"], "AAA");
+    }
+    try {
+        jsonXX::Var array("[0,1,2,3]");
+        ASSERT_EQ(array.getEntity()->getType(), jsonXX::Data::TypeArray);
+    } catch (exception& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        jsonXX::Var object("{a:0,b:'1',c:2,d:'3'}");
+        ASSERT_EQ(object.getEntity()->getType(), jsonXX::Data::TypeObject);
+    } catch (exception& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        jsonXX::Var var;
+        jsonXX::Var array("[0,1,2,3]");
+        var["c"] = array;
+        ASSERT_EQ(var["c"][3], 3.0);
+    } catch (exception& e) {
+        cerr << e.what() << endl;
+    }
+    try {
+        jsonXX::Var var;
+        jsonXX::Var object("{a:0,b:'1',c:2,d:'3'}");
+        var["d"] = object;
+        ASSERT_EQ(var["d"]["d"], "3");
+    } catch (exception& e) {
+        cerr << e.what() << endl;
+    }
     report();
     return (count_fail > 0) ? -1 : 0;
 }
