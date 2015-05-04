@@ -58,7 +58,7 @@ namespace json {
                             is.unget();
                             key.parseObjectKey(is);
                             value.parse(is);
-                            this->entity->set(key.entity->getString(), *value.entity);
+                            this->entity->set(key.entity->getString(), value);
                             flush = false;
                         } else {
                             throw invalid_argument("key-value value not end by comma.");

@@ -107,8 +107,7 @@ namespace json {
             this->assign(new Object());
         }
         if(!this->entity->exists(key)) {
-            Value e;
-            e.setString("");
+            var e("''");
             this->entity->set(key, e);
         }
         return this->entity->get(key);

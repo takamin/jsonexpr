@@ -50,7 +50,6 @@ namespace json {
             var& operator [](const std::string& key);
             const var& operator [](const std::string& key) const;
         public:
-            const VarEntity* getEntity() const { return entity; }
             const void writeJson(std::ostream& os) const;
         private:
             void assign(VarEntity* entity);
@@ -88,7 +87,7 @@ namespace json {
             virtual int push(const var& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
             virtual const var& get(int index) const { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
-            virtual int set(const std::string& key, const VarEntity& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
+            virtual int set(const std::string& key, const var& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
             virtual bool exists(const std::string& key) const { throw new std::runtime_error("exists(key) called, but this is NOT json::Object."); }
             virtual const var& get(const std::string& key) const { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
             virtual var& get(const std::string& key) { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
@@ -216,7 +215,7 @@ namespace json {
             Object(const Object& that) : VarEntity(var::TypeObject) {
                 std::map<std::string, var*>::const_iterator entry = that.value.begin();
                 for(; entry != that.value.end(); entry++) {
-                    this->set(entry->first, *(entry->second->getEntity()));
+                    this->set(entry->first, *entry->second);
                 }
             }
             ~Object() {
@@ -245,7 +244,7 @@ namespace json {
             bool exists(const std::string& key) const {
                 return getValuePtr(key) != 0;
             }
-            int set(const std::string& key, const VarEntity& data) {
+            int set(const std::string& key, const var& data) {
                 std::map<std::string, var*>::iterator it = value.find(key);
                 if(it != value.end()) {
                     delete it->second;
