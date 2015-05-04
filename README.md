@@ -3,15 +3,15 @@ jsonXX
 
 C++でJSONを扱うためのクラスライブラリです。
 
-jsonXX::Varクラスでjavascriptの基本データ型(数値、文字列、配列、オブジェクト)
+json::varクラスでjavascriptの基本データ型(数値、文字列、配列、オブジェクト)
 を表現しており、JSONデータのストリーム入出力機能を提供します。
 
 ## データ型
 
 1. 数値 - double型の数値
 2. 文字列 - std::string型の文字列
-3. 配列 - jsonXX::Var型の配列
-4. オブジェクト - 文字列からjsonXX::Var型へのディクショナリ
+3. 配列 - json::var型の配列
+4. オブジェクト - 文字列からjson::var型へのディクショナリ
 
 ## 初期化
 
@@ -19,19 +19,19 @@ jsonXX::Varクラスでjavascriptの基本データ型(数値、文字列、配�
 
 ```
 //数値の初期化(内部表現は全てdouble)
-jsonXX::Var real("-1.234e+5");  //浮動小数点
-jsonXX::Var dec("1234");        //10進整数
-jsonXX::Var hex("0x1234");      //16進整数
-jsonXX::Var oct("0644");        //8進整数
+json::var real("-1.234e+5");  //浮動小数点
+json::var dec("1234");        //10進整数
+json::var hex("0x1234");      //16進整数
+json::var oct("0644");        //8進整数
 
 //文字列で初期化
-jsonXX::Var str("'string'");    //シングルクォート
+json::var str("'string'");    //シングルクォート
 
 //配列の初期化
-jsonXX::Var arr("[-1.234e+5,'string']");
+json::var arr("[-1.234e+5,'string']");
 
 //オブジェクトの初期化
-jsonXX::Var obj("{'key':'value', foo: 'bar', arr:[1,2,3,4]}");
+json::var obj("{'key':'value', foo: 'bar', arr:[1,2,3,4]}");
 ```
 
 ## 参照
@@ -67,7 +67,7 @@ C++標準のストリームに対する入出力機能を提供しています�
 ### JSONの読み込み
 
 ```
-jsonXX::Var dataobj;
+json::var dataobj;
 ifstream is("input.json");
 is >> dataobj;
 ```
@@ -75,7 +75,7 @@ is >> dataobj;
 ### JSONの出力
 
 ```
-jsonXX::Var dataobj;
+json::var dataobj;
 ofstream is("output.json");
 os << dataobj;
 ```
@@ -95,10 +95,10 @@ javascriptの仕様に完全準拠しているわけではありません。
 
 ```
     // json 文字列からの構築
-    jsonXX::Var num("-1.2345e+3");
-    jsonXX::Var str("'this is string.'");
-    jsonXX::Var arr("[ \"key\", 'str', 'hex', 0xABCD, 0777 ]");
-    jsonXX::Var obj("{ foo : 'bar', 'boo':1.2345e-6, 'arr': [0,1,2,3]}");
+    json::var num("-1.2345e+3");
+    json::var str("'this is string.'");
+    json::var arr("[ \"key\", 'str', 'hex', 0xABCD, 0777 ]");
+    json::var obj("{ foo : 'bar', 'boo':1.2345e-6, 'arr': [0,1,2,3]}");
 
     // 参照
     double numval = num;
@@ -127,7 +127,7 @@ javascriptの仕様に完全準拠しているわけではありません。
     // オブジェクトへ新たなキーを追加
     //
     cout << "obj.exists('new key') = " << (obj.exists("new key")?"true":"false") << endl;
-    obj["new key"] = jsonXX::Var("[0,1,2,3]");
+    obj["new key"] = json::var("[0,1,2,3]");
     cout << "obj.exists('new key') = " << (obj.exists("new key")?"true":"false") << endl;
 
     //

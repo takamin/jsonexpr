@@ -9,45 +9,52 @@
 #include <map>
 #include <stdexcept>
 
-namespace jsonXX {
+namespace json {
 
     //
-    // Var class
+    // var class
     //
-    class Data;
-    class Var {
+    class VarEntity;
+    class var {
         public:
-            static Var Null;
+            enum Type {
+                TypeNull = 0,
+                TypeNumber = 2,
+                TypeString = 3,
+                TypeArray = 4,
+                TypeObject = 5, };
+            static var Null;
         public:
-            Var();
-            Var(const std::string& json);
-            virtual ~Var();
-            void setEntity(const Data* entity);
-            Data* getEntity() { return entity; }
-            const Data* getEntity() const { return entity; }
+            var();
+            var(const std::string& json);
+            virtual ~var();
+            void parse(std::istream& is);
+            Type getType() const;
+        public:
             operator double() const;
             operator const std::string&() const;
-            Var& operator = (const Var& var);
-            Var& operator = (double value);
-            Var& operator = (const char* value);
-            Var& operator = (const std::string& value);
-            Var& operator = (const Data& value);
+            var& operator = (const var& var);
+            var& operator = (double value);
+            var& operator = (const char* value);
+            var& operator = (const std::string& value);
+            var& operator = (const VarEntity& value);
 
             int length() const;
             void push(double value);
             void push(const std::string& value);
-            void push(const Var& value);
-            Var& operator [](int index);
-            const Var& operator [](int index) const;
+            void push(const var& value);
+            var& operator [](int index);
+            const var& operator [](int index) const;
             
             bool exists(const std::string& key) const;
-            Var& operator [](const std::string& key);
-            const Var& operator [](const std::string& key) const;
-        private:
-            void assign(Data* entity);
+            var& operator [](const std::string& key);
+            const var& operator [](const std::string& key) const;
         public:
-            void parse(std::istream& is);
+            void setEntity(const VarEntity* entity);
+            VarEntity* getEntity() { return entity; }
+            const VarEntity* getEntity() const { return entity; }
         private:
+            void assign(VarEntity* entity);
             void parseObject(std::istream& is);
             void parseObjectKey(std::istream& is);
             void parseArray(std::istream& is);
@@ -55,136 +62,66 @@ namespace jsonXX {
             void parseString(std::istream& is);
             void parseNumber(std::istream& is);
         private:
-            Data* entity;
+            VarEntity* entity;
     };
-    std::ostream& operator << (std::ostream& os, const Var& var);
-    std::istream& operator >> (std::istream& is, Var& var);
+    std::ostream& operator << (std::ostream& os, const var& var);
+    std::istream& operator >> (std::istream& is, var& var);
 
     //
-    // class Data
+    // class VarEntity
     //
-    class Data {
-        friend class Var;
-        public:
-            enum Type {
-                TypeNull = 0,
-                TypeInteger = 1,
-                TypeDouble = 2,
-                TypeString = 3,
-                TypeArray = 4,
-                TypeObject = 5, };
-            Data() : type(TypeNull) { }
-            Data(const Data& that) : type(that.type) { }
-            virtual ~Data() {}
-            virtual Data* clone() const = 0;
-            virtual std::ostream& writeJson(std::ostream& os) const = 0;
-            
-            //
-            // features of Number
-            //
-
-        public:
-            operator double() const { return getNumber(); }
-            virtual void setNumber(double value) { throw new std::runtime_error("setNumber called, but this is NOT jsonXX::Value."); }
-        private:
-            virtual double getNumber() const { throw new std::runtime_error("getNumber called, but this is NOT jsonXX::Value."); }
-
-            //
-            // features of String
-            //
-
-        public:
-            operator const std::string&() const { return getString(); }
-            virtual void setString(const std::string& value) { throw new std::runtime_error("setString called, but this is NOT jsonXX::Value."); }
-        private:
-            virtual const std::string& getString() const { throw new std::runtime_error("getString called, but this is NOT jsonXX::Value."); }
-            
-            //
-            // features of Array
-            //
-
-        public:
-            virtual int size() { throw new std::runtime_error("size called, but this is NOT jsonXX::Array."); }
-            virtual int push(const Data& item) { throw new std::runtime_error("push called, but this is NOT jsonXX::Array."); }
-            /*!
-             * An element specified by index of array.
-             *
-             * returns an element of array specified by the index.
-             * if this is not type of json arrau, exception will be thrown.
-             */
-            Var& operator[](int index) { return this->get(index); }
-            const Var& operator[](int index) const { return this->get(index); }
-        private:
-            virtual const Var& get(int index) const { throw new std::runtime_error("get(index) called, but this is NOT jsonXX::Array."); }
-            virtual Var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT jsonXX::Array."); }
-
-            //
-            // features of Object
-            //
-
-        public:
-            virtual int set(const std::string& key, const Data& data) { throw new std::runtime_error("set called, but this is NOT jsonXX::Object."); }
-            virtual bool exists(const std::string& key) const { throw new std::runtime_error("exists(key) called, but this is NOT jsonXX::Object."); }
-
-            /*!
-             * A value identified by key.
-             *
-             * returns a value identified by the key of this object.
-             * if this is not type of json object, exception will be thrown.
-             */
-            Var& operator[](const std::string& key);
-            const Var& operator[](const std::string& key) const;
-        private:
-            virtual const Var& get(const std::string& key) const { throw new std::runtime_error("get(key) called, but this is NOT jsonXX::Object."); }
-            virtual Var& get(const std::string& key) { throw new std::runtime_error("get(key) called, but this is NOT jsonXX::Object."); }
-
+    class VarEntity {
+        friend class var;
         protected:
-            Data(Type type) : type(type) { }
-            void setType(Type type) { this->type = type; }
+            VarEntity(var::Type type) : type(type) { }
+            void setType(var::Type type) { this->type = type; }
+            var::Type getType() const { return this->type; }
+            virtual ~VarEntity() {}
         public:
-            Type getType() const { return this->type; }
+            virtual std::ostream& writeJson(std::ostream& os) const = 0;
         private:
-            Type type;
+            virtual VarEntity* clone() const = 0;
+            virtual void setNumber(double value) { throw new std::runtime_error("setNumber called, but this is NOT json::Value."); }
+            virtual double getNumber() const { throw new std::runtime_error("getNumber called, but this is NOT json::Value."); }
+            virtual void setString(const std::string& value) { throw new std::runtime_error("setString called, but this is NOT json::Value."); }
+            virtual const std::string& getString() const { throw new std::runtime_error("getString called, but this is NOT json::Value."); }
+            virtual int size() { throw new std::runtime_error("size called, but this is NOT json::Array."); }
+            virtual int push(const VarEntity& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
+            virtual const var& get(int index) const { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
+            virtual var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
+            virtual int set(const std::string& key, const VarEntity& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
+            virtual bool exists(const std::string& key) const { throw new std::runtime_error("exists(key) called, but this is NOT json::Object."); }
+            virtual const var& get(const std::string& key) const { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
+            virtual var& get(const std::string& key) { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
+        private:
+            var::Type type;
     };
 
-    template<class T> bool operator ==(const Data& data1, T data2) { return (double)data1 == (double)data2; }
-    template<class T> bool operator ==(double data2, const Data& data1) { return (double)data1 == (double)data2; }
-    
-    template<class T> bool operator !=(const Data& data1, double data2) { return (double)data1 != (double)data2; }
-    template<class T> bool operator !=(double data2, const Data& data1) { return (double)data1 != (double)data2; }
-    
-    template<class T> bool operator <(const Data& data1, T data2) { return (double)data1 < (double)data2; }
-    template<class T> bool operator <(double data2, const Data& data1) { return (double)data1 >= (double)data2; }
-    
-    template<class T> bool operator <=(const Data& data1, T data2) { return (double)data1 <= (double)data2; }
-    template<class T> bool operator <=(double data2, const Data& data1) { return (double)data1 > (double)data2; }
-    
-    template<class T> bool operator >(const Data& data1, T data2) { return (double)data1 > (double)data2; }
-    template<class T> bool operator >(double data2, const Data& data1) { return (double)data1 <= (double)data2; }
-    
-    template<class T> bool operator >=(const Data& data1, T data2) { return (double)data1 >= (double)data2; }
-    template<class T> bool operator >=(double data2, const Data& data1) { return (double)data1 < (double)data2; }
-
-    inline bool operator ==(const Data& data1, const std::string& data2) { return (const std::string&)data1 == data2; }
-    inline bool operator ==(const std::string& data2, const Data& data1) { return (const std::string&)data1 == data2; }
-
-    inline bool operator !=(const Data& data1, const std::string& data2) { return (const std::string&)data1 != data2; }
-    inline bool operator !=(const std::string& data2, const Data& data1) { return (const std::string&)data1 != data2; }
-
-    class Value : public Data {
+    inline std::string escapeString(const std::string& s) {
+        std::ostringstream ss;
+        std::string::const_iterator c = s.begin();
+        for(; c != s.end(); c++) {
+            switch(*c) {
+                case '\"': ss << '\\' << '"'; break;
+                case '\n': ss << '\\' << 'n'; break;
+                case '\r': ss << '\\' << 'r'; break;
+                case '\t': ss << '\\' << 't'; break;
+                default: ss << (char)*c; break;
+            }
+        }
+        return ss.str();
+    }
+    class Value : public VarEntity {
+        friend class var;
+        private:
+            Value() : VarEntity(var::TypeNull), value("") {}
         public:
-            Value() : Data(TypeNull), value("") {}
-            Value(const Value& that) : Data(that.getType()), value(that.value) { }
-            Value(double value) : Data(Data::TypeDouble), value(Value::num2str(value)) { }
-            Value(const std::string& value) : Data(Data::TypeString), value(value) { }
-
-            Data* clone() const { return new Value(*this); }
             std::ostream& writeJson(std::ostream& os) const {
                 switch(getType()) {
-                    case Data::TypeDouble:
+                    case var::TypeNumber:
                         os << str2num(value);
                         break;
-                    case Data::TypeString:
+                    case var::TypeString:
                         os << "\"";
                         os << escapeString(value);
                         os << "\"";
@@ -192,27 +129,19 @@ namespace jsonXX {
                 }
                 return os;
             }
-            void setString(const std::string& value) { this->value = value; setType(Data::TypeString); }
-            void setNumber(double value) { this->value = num2str(value); setType(Data::TypeDouble); }
-
-        public:
-            static std::string escapeString(const std::string& s) {
-                std::ostringstream ss;
-                std::string::const_iterator c = s.begin();
-                for(; c != s.end(); c++) {
-                    switch(*c) {
-                        case '\"': ss << '\\' << '"'; break;
-                        case '\n': ss << '\\' << 'n'; break;
-                        case '\r': ss << '\\' << 'r'; break;
-                        case '\t': ss << '\\' << 't'; break;
-                        default: ss << (char)*c; break;
-                    }
-                }
-                return ss.str();
-            }
         private:
-            const std::string& getString() const { return value; }
-            double getNumber() const { return Value::str2num(value); }
+            VarEntity* clone() const { return new Value(*this); }
+            void setString(const std::string& value) {
+                this->value = value; setType(var::TypeString);
+            }
+            const std::string& getString() const {
+                return value;
+            }
+            void setNumber(double value) {
+                this->value = num2str(value);
+                setType(var::TypeNumber); }
+            double getNumber() const { return Value::str2num(value);
+            }
             static double str2num(const std::string& s) {
                 double value = 0.0;
                 std::istringstream(s) >> value;
@@ -227,22 +156,23 @@ namespace jsonXX {
             std::string value;
     };
 
-    class Array : public Data {
-        public:
-            Array() : Data(Data::TypeArray) { }
-            Array(const Array& that) : Data(Data::TypeArray) {
-                std::vector<Var*>::const_iterator item = that.value.begin();
+    class Array : public VarEntity {
+        friend class var;
+        private:
+            Array() : VarEntity(var::TypeArray) { }
+            Array(const Array& that) : VarEntity(var::TypeArray) {
+                std::vector<var*>::const_iterator item = that.value.begin();
                 for(; item != that.value.end(); item++) {
                     this->push(*((*item)->getEntity()));
                 }
             }
             ~Array() {
-                std::vector<Var*>::const_iterator item = value.begin();
+                std::vector<var*>::const_iterator item = value.begin();
                 for(; item != value.end(); item++) {
                     delete *item;
                 }
             }
-            Data* clone() const { return new Array(*this); }
+        public:
             std::ostream& writeJson(std::ostream& os) const {
                 os << "[";
                 int n = value.size();
@@ -255,47 +185,54 @@ namespace jsonXX {
                 os << "]";
                 return os;
             }
+        private:
+            VarEntity* clone() const { return new Array(*this); }
             int size() { return value.size(); }
-            int push(const Data& item) {
-                Var* var = new Var();
-                var->setEntity(&item);
-                value.push_back(var);
+            int push(const VarEntity& item) {
+                var* v = new var();
+                v->setEntity(&item);
+                value.push_back(v);
             }
-        private:
-            const Var& get(int index) const;
-            Var& get(int index);
-        private:
+            const var& get(int index) const {
+                assertValidIndex(index);
+                return *(this->value[index]);
+            }
+            var& get(int index) {
+                assertValidIndex(index);
+                return *(this->value[index]);
+            }
             void assertValidIndex(int index) const {
                 if(index < 0 || value.size() <= index) {
-                    throw new std::out_of_range("jsonXX::Array index out of range.");
+                    throw new std::out_of_range("json::Array index out of range.");
                 }
             }
         private:
-            std::vector<Var*> value;
+            std::vector<var*> value;
     };
 
-    class Object : public Data {
-        public:
-            Object() : Data(Data::TypeObject) { }
-            Object(const Object& that) : Data(Data::TypeObject) {
-                std::map<std::string, Var*>::const_iterator entry = that.value.begin();
+    class Object : public VarEntity {
+        friend class var;
+        private:
+            Object() : VarEntity(var::TypeObject) { }
+            Object(const Object& that) : VarEntity(var::TypeObject) {
+                std::map<std::string, var*>::const_iterator entry = that.value.begin();
                 for(; entry != that.value.end(); entry++) {
                     this->set(entry->first, *(entry->second->getEntity()));
                 }
             }
             ~Object() {
-                std::map<std::string, Var*>::const_iterator entry = value.begin();
+                std::map<std::string, var*>::const_iterator entry = value.begin();
                 for(; entry != value.end(); entry++) {
                     delete entry->second;
                 }
             }
-            Data* clone() const { return new Object(*this); }
+        public:
             std::ostream& writeJson(std::ostream& os) const {
                 os << "{";
                 int i = 0, n = value.size();
-                std::map<std::string, Var*>::const_iterator kv = value.begin();
+                std::map<std::string, var*>::const_iterator kv = value.begin();
                 for(; kv != value.end(); kv++, i++) {
-                    os << "\"" << Value::escapeString(kv->first) << "\":";
+                    os << "\"" << escapeString(kv->first) << "\":";
                     kv->second->getEntity()->writeJson(os);
                     if(i < n - 1) {
                         os << ',';
@@ -304,116 +241,97 @@ namespace jsonXX {
                 os << "}";
                 return os;
             }
-            bool exists(const std::string& key) const { return getValuePtr(key) != 0; }
-            int set(const std::string& key, const Data& data) {
-                std::map<std::string, Var*>::iterator it = value.find(key);
+        private:
+            VarEntity* clone() const { return new Object(*this); }
+            bool exists(const std::string& key) const {
+                return getValuePtr(key) != 0;
+            }
+            int set(const std::string& key, const VarEntity& data) {
+                std::map<std::string, var*>::iterator it = value.find(key);
                 if(it != value.end()) {
                     delete it->second;
                     value.erase(it);
                 }
-                Var* var = new Var();
-                var->setEntity(&data);
-                std::pair<std::string, Var*> item(key, var);
+                var* v = new var();
+                v->setEntity(&data);
+                std::pair<std::string, var*> item(key, v);
                 value.insert(item);
             }
-        private:
-            const Var& get(const std::string& key) const {
-                const Var* p = getValuePtr(key);
-                return (p) ? *p : Var::Null;
+            const var& get(const std::string& key) const {
+                const var* p = getValuePtr(key);
+                return (p) ? *p : var::Null;
             }
-            Var& get(const std::string& key) {
-                Var* p = getValuePtr(key);
-                return (p) ? *p : Var::Null;
+            var& get(const std::string& key) {
+                var* p = getValuePtr(key);
+                return (p) ? *p : var::Null;
             }
-
-        private:
-            const Var* getValuePtr(const std::string& key) const { ((Object*)this)->getValuePtr(key); }
-            Var* getValuePtr(const std::string& key) {
-                std::map<std::string, Var*>::iterator it = value.find(key);
+            const var* getValuePtr(const std::string& key) const {
+                ((Object*)this)->getValuePtr(key);
+            }
+            var* getValuePtr(const std::string& key) {
+                std::map<std::string, var*>::iterator it = value.find(key);
                 return (it == value.end()) ? 0 : it->second;
             }
         private:
-            std::map<std::string, Var*> value;
+            std::map<std::string, var*> value;
     };
 
     //
-    // class Data
-    //
-    inline Var& Data::operator[](const std::string& key)
-    {
-        return this->get(key);
-    }
-    inline const Var& Data::operator[](const std::string& key) const
-    {
-        return this->get(key);
-    }
-    inline const Var& Array::get(int index) const
-    {
-        assertValidIndex(index);
-        return *(this->value[index]);
-    }
-    inline Var& Array::get(int index)
-    {
-        assertValidIndex(index);
-        return *(this->value[index]);
-    }
-
-    //
-    // Compare templates with Var
+    // Compare templates with var
     //
 
-    template<class T> bool operator ==(const Var& data1, T data2)
+    template<class T> bool operator ==(const var& data1, T data2)
         { return (double)data1 == (double)data2; }
-    template<class T> bool operator ==(double data2, const Var& data1)
+    template<class T> bool operator ==(double data2, const var& data1)
         { return (double)data1 == (double)data2; }
 
-    template<class T> bool operator !=(const Var& data1, double data2)
+    template<class T> bool operator !=(const var& data1, double data2)
         { return (double)data1 != (double)data2; }
-    template<class T> bool operator !=(double data2, const Var& data1)
+    template<class T> bool operator !=(double data2, const var& data1)
         { return (double)data1 != (double)data2; }
 
-    template<class T> bool operator <(const Var& data1, T data2)
+    template<class T> bool operator <(const var& data1, T data2)
         { return (double)data1 < (double)data2; }
-    template<class T> bool operator <(double data2, const Var& data1)
+    template<class T> bool operator <(double data2, const var& data1)
         { return (double)data1 >= (double)data2; }
 
-    template<class T> bool operator <=(const Var& data1, T data2)
+    template<class T> bool operator <=(const var& data1, T data2)
         { return (double)data1 <= (double)data2; }
-    template<class T> bool operator <=(double data2, const Var& data1)
+    template<class T> bool operator <=(double data2, const var& data1)
         { return (double)data1 > (double)data2; }
 
-    template<class T> bool operator >(const Var& data1, T data2)
+    template<class T> bool operator >(const var& data1, T data2)
         { return (double)data1 > (double)data2; }
-    template<class T> bool operator >(double data2, const Var& data1)
+    template<class T> bool operator >(double data2, const var& data1)
         { return (double)data1 <= (double)data2; }
 
-    template<class T> bool operator >=(const Var& data1, T data2)
+    template<class T> bool operator >=(const var& data1, T data2)
         { return (double)data1 >= (double)data2; }
-    template<class T> bool operator >=(double data2, const Var& data1)
+    template<class T> bool operator >=(double data2, const var& data1)
         { return (double)data1 < (double)data2; }
 
     //
-    // Compare between Var and string
+    // Compare between var and string
     //
 
-    inline bool operator ==(const Var& data1, const std::string& data2)
+    inline bool operator ==(const var& data1, const std::string& data2)
         { return (const std::string&)data1 == data2; }
-    inline bool operator ==(const std::string& data2, const Var& data1)
+    inline bool operator ==(const std::string& data2, const var& data1)
         { return (const std::string&)data1 == data2; }
 
-    inline bool operator !=(const Var& data1, const std::string& data2)
+    inline bool operator !=(const var& data1, const std::string& data2)
         { return (const std::string&)data1 != data2; }
-    inline bool operator !=(const std::string& data2, const Var& data1)
+    inline bool operator !=(const std::string& data2, const var& data1)
         { return (const std::string&)data1 != data2; }
 
-    inline bool operator ==(const Var& data1, const char* data2)
+    inline bool operator ==(const var& data1, const char* data2)
         { return (const std::string&)data1 == std::string(data2); }
-    inline bool operator ==(const char* data2, const Var& data1)
+    inline bool operator ==(const char* data2, const var& data1)
         { return (const std::string&)data1 == std::string(data2); }
 
-    inline bool operator !=(const Var& data1, const char* data2)
+    inline bool operator !=(const var& data1, const char* data2)
         { return (const std::string&)data1 != std::string(data2); }
-    inline bool operator !=(const char* data2, const Var& data1)
+    inline bool operator !=(const char* data2, const var& data1)
         { return (const std::string&)data1 != std::string(data2); }
 }
 

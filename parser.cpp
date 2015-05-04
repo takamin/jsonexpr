@@ -4,9 +4,9 @@
 #include <stdlib.h>
 #include <ctype.h>
 #include "jsonXX.h"
-namespace jsonXX {
+namespace json {
     using namespace std;
-    void Var::parse(istream& is)
+    void var::parse(istream& is)
     {
         int c;
         while((c = is.get()) != EOF) {
@@ -36,7 +36,7 @@ namespace jsonXX {
                 break;
         }
     }
-    void Var::parseObject(istream& is)
+    void var::parseObject(istream& is)
     {
         int c;
         bool flush = true;
@@ -54,7 +54,7 @@ namespace jsonXX {
                         break;
                     default:
                         if(flush) {
-                            Var key, value;
+                            var key, value;
                             is.unget();
                             key.parseObjectKey(is);
                             value.parse(is);
@@ -68,7 +68,7 @@ namespace jsonXX {
             }
         }
     }
-    void Var::parseObjectKey(istream& is)
+    void var::parseObjectKey(istream& is)
     {
         int c;
         while((c = is.get()) != EOF) {
@@ -90,10 +90,10 @@ namespace jsonXX {
             }
         }
     }
-    void Var::parseArray(istream& is)
+    void var::parseArray(istream& is)
     {
         int c;
-        Var value;
+        var value;
         bool flush = true;
         while((c = is.get()) != EOF) {
             if(!isspace(c)) {
@@ -122,7 +122,7 @@ namespace jsonXX {
             }
         }
     }
-    void Var::parseIdentifier(istream& is)
+    void var::parseIdentifier(istream& is)
     {
         int c;
         bool double_quote = false;
@@ -137,7 +137,7 @@ namespace jsonXX {
             }
         }
     }
-    void Var::parseString(istream& is)
+    void var::parseString(istream& is)
     {
         int c;
         bool double_quote = false;
@@ -183,7 +183,7 @@ namespace jsonXX {
             }
         }
     }
-    void Var::parseNumber(istream& is)
+    void var::parseNumber(istream& is)
     {
         int radix = 10;
         stringstream ss;

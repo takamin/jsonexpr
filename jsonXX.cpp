@@ -1,120 +1,132 @@
 #include <sstream>
 #include "jsonXX.h"
-namespace jsonXX {
+namespace json {
     using namespace std;
-    Var Var::Null;
-    Value Null;
+    var var::Null;
 
     //
-    // class Var
+    // class var
     //
-    Var::Var()
+    var::var()
         : entity(new Value())
     {
     }
-    Var::Var(const std::string& json)
+    var::var(const std::string& json)
         : entity(new Value())
     {
         istringstream ss(json);
         ss >> *this;
     }
-    Var::~Var()
+    var::~var()
     {
         delete entity;
     }
-    void Var::setEntity(const Data* entity)
+    var::Type var::getType() const
+    {
+        return this->entity->getType();
+    }
+    void var::setEntity(const VarEntity* entity)
     {
         assign(entity->clone());
     }
-    void Var::assign(Data* entity)
+    void var::assign(VarEntity* entity)
     {
         delete this->entity;
         this->entity = entity;
     }
-    Var& Var::operator = (const Var& var)
+    var& var::operator = (const var& var)
     {
         this->assign(var.entity->clone());
         return *this;
     }
-    Var& Var::operator = (double value)
+    var& var::operator = (double value)
     {
-        this->assign(new Value(value));
+        Value* p = new Value();
+        p->setNumber(value);
+        this->assign(p);
         return *this;
     }
-    Var& Var::operator = (const Data& value)
+    var& var::operator = (const VarEntity& value)
     {
         this->assign(value.clone());
         return *this;
     }
-    Var& Var::operator = (const char* value)
+    var& var::operator = (const char* value)
     {
-        this->assign(new Value(value));
+        Value* p = new Value();
+        p->setString(value);
+        this->assign(p);
         return *this;
     }
-    Var& Var::operator = (const std::string& value)
+    var& var::operator = (const std::string& value)
     {
-        this->assign(new Value(value));
+        Value* p = new Value();
+        p->setString(value);
+        this->assign(p);
         return *this;
     }
-    Var::operator double() const
+    var::operator double() const
     {
         return this->entity->getNumber();
     }
-    Var::operator const std::string&() const
+    var::operator const std::string&() const
     {
         return this->entity->getString();
     }
-    int Var::length() const
+    int var::length() const
     {
         return this->entity->size();
     }
-    void Var::push(double value)
+    void var::push(double value)
     {
-        Value data(value);
+        Value data;
+        data.setNumber(value);
         this->entity->push(data);
     }
-    void Var::push(const std::string& value)
+    void var::push(const std::string& value)
     {
-        Value data(value);
+        Value data;
+        data.setString(value);
         this->entity->push(data);
     }
-    void Var::push(const Var& value)
+    void var::push(const var& value)
     {
         this->entity->push(*value.getEntity());
     }
-    Var& Var::operator [](int index)
+    var& var::operator [](int index)
     {
-        return this->entity->operator[](index);
+        return this->entity->get(index);
     }
-    const Var& Var::operator [](int index) const
+    const var& var::operator [](int index) const
     {
-        return this->entity->operator[](index);
+        return this->entity->get(index);
     }
-    bool Var::exists(const std::string& key) const
+    bool var::exists(const std::string& key) const
     {
         return this->entity->exists(key);
     }
-    Var& Var::operator [](const std::string& key)
+    var& var::operator [](const std::string& key)
     {
-        if(this->entity->getType() != Data::TypeObject) {
+        if(this->entity->getType() != var::TypeObject) {
             this->assign(new Object());
         }
         if(!this->entity->exists(key)) {
-            Value empty("");
-            this->entity->set(key, empty);
+            Value e;
+            e.setString("");
+            this->entity->set(key, e);
         }
-        return this->entity->operator[](key);
+        return this->entity->get(key);
     }
-    const Var& Var::operator [](const std::string& key) const
+    const var& var::operator [](const std::string& key) const
     {
-        return this->entity->operator[](key);
+        return this->entity->get(key);
     }
-    std::ostream& operator << (std::ostream& os, const Var& var)
+    std::ostream& operator << (std::ostream& os, const var& var)
     {
         var.getEntity()->writeJson(os);
         return os;
     }
-    std::istream& operator >> (std::istream& is, Var& var)
+    std::istream& operator >> (std::istream& is, var& var)
     {
         var.parse(is);
         return is;
