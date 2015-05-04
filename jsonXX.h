@@ -50,8 +50,6 @@ namespace json {
             var& operator [](const std::string& key);
             const var& operator [](const std::string& key) const;
         public:
-            void setEntity(const VarEntity* entity);
-            VarEntity* getEntity() { return entity; }
             const VarEntity* getEntity() const { return entity; }
         private:
             void assign(VarEntity* entity);
@@ -190,7 +188,7 @@ namespace json {
             int size() { return value.size(); }
             int push(const VarEntity& item) {
                 var* v = new var();
-                v->setEntity(&item);
+                *v = item;
                 value.push_back(v);
             }
             const var& get(int index) const {
@@ -253,7 +251,7 @@ namespace json {
                     value.erase(it);
                 }
                 var* v = new var();
-                v->setEntity(&data);
+                *v = data;
                 std::pair<std::string, var*> item(key, v);
                 value.insert(item);
             }

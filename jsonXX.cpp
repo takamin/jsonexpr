@@ -25,10 +25,6 @@ namespace json {
     {
         return this->entity->getType();
     }
-    void var::setEntity(const VarEntity* entity)
-    {
-        assign(entity->clone());
-    }
     void var::assign(VarEntity* entity)
     {
         delete this->entity;
