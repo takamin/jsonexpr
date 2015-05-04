@@ -32,8 +32,15 @@ namespace jsonXX {
             Var& operator = (const char* value);
             Var& operator = (const std::string& value);
             Var& operator = (const Data& value);
+
+            int length() const;
+            void push(double value);
+            void push(const std::string& value);
+            void push(const Var& value);
             Var& operator [](int index);
             const Var& operator [](int index) const;
+            
+            bool exists(const std::string& key) const;
             Var& operator [](const std::string& key);
             const Var& operator [](const std::string& key) const;
         private:

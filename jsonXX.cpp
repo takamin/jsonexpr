@@ -64,6 +64,24 @@ namespace jsonXX {
     {
         return this->entity->getString();
     }
+    int Var::length() const
+    {
+        return this->entity->size();
+    }
+    void Var::push(double value)
+    {
+        Value data(value);
+        this->entity->push(data);
+    }
+    void Var::push(const std::string& value)
+    {
+        Value data(value);
+        this->entity->push(data);
+    }
+    void Var::push(const Var& value)
+    {
+        this->entity->push(*value.getEntity());
+    }
     Var& Var::operator [](int index)
     {
         return this->entity->operator[](index);
@@ -71,6 +89,10 @@ namespace jsonXX {
     const Var& Var::operator [](int index) const
     {
         return this->entity->operator[](index);
+    }
+    bool Var::exists(const std::string& key) const
+    {
+        return this->entity->exists(key);
     }
     Var& Var::operator [](const std::string& key)
     {
