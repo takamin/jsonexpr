@@ -51,6 +51,7 @@ namespace json {
             const var& operator [](const std::string& key) const;
         public:
             const VarEntity* getEntity() const { return entity; }
+            const void writeJson(std::ostream& os) const;
         private:
             void assign(VarEntity* entity);
             void parseObject(std::istream& is);
@@ -84,7 +85,7 @@ namespace json {
             virtual void setString(const std::string& value) { throw new std::runtime_error("setString called, but this is NOT json::Value."); }
             virtual const std::string& getString() const { throw new std::runtime_error("getString called, but this is NOT json::Value."); }
             virtual int size() { throw new std::runtime_error("size called, but this is NOT json::Array."); }
-            virtual int push(const VarEntity& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
+            virtual int push(const var& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
             virtual const var& get(int index) const { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual int set(const std::string& key, const VarEntity& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
@@ -161,7 +162,7 @@ namespace json {
             Array(const Array& that) : VarEntity(var::TypeArray) {
                 std::vector<var*>::const_iterator item = that.value.begin();
                 for(; item != that.value.end(); item++) {
-                    this->push(*((*item)->getEntity()));
+                    this->push(**item);
                 }
             }
             ~Array() {
@@ -175,7 +176,7 @@ namespace json {
                 os << "[";
                 int n = value.size();
                 for(int i = 0; i < n; i++) {
-                    value[i]->getEntity()->writeJson(os);
+                    os << *value[i];
                     if(i < n - 1) {
                         os << ',';
                     }
@@ -186,7 +187,7 @@ namespace json {
         private:
             VarEntity* clone() const { return new Array(*this); }
             int size() { return value.size(); }
-            int push(const VarEntity& item) {
+            int push(const var& item) {
                 var* v = new var();
                 *v = item;
                 value.push_back(v);
@@ -231,7 +232,7 @@ namespace json {
                 std::map<std::string, var*>::const_iterator kv = value.begin();
                 for(; kv != value.end(); kv++, i++) {
                     os << "\"" << escapeString(kv->first) << "\":";
-                    kv->second->getEntity()->writeJson(os);
+                    os << *kv->second;
                     if(i < n - 1) {
                         os << ',';
                     }

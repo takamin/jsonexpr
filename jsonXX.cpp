@@ -75,19 +75,19 @@ namespace json {
     }
     void var::push(double value)
     {
-        Value data;
-        data.setNumber(value);
+        var data;
+        data = value;
         this->entity->push(data);
     }
     void var::push(const std::string& value)
     {
-        Value data;
-        data.setString(value);
+        var data;
+        data = value;
         this->entity->push(data);
     }
     void var::push(const var& value)
     {
-        this->entity->push(*value.getEntity());
+        this->entity->push(value);
     }
     var& var::operator [](int index)
     {
@@ -113,13 +113,17 @@ namespace json {
         }
         return this->entity->get(key);
     }
+    const void var::writeJson(std::ostream& os) const
+    {
+        this->entity->writeJson(os);
+    }
     const var& var::operator [](const std::string& key) const
     {
         return this->entity->get(key);
     }
     std::ostream& operator << (std::ostream& os, const var& var)
     {
-        var.getEntity()->writeJson(os);
+        var.writeJson(os);
         return os;
     }
     std::istream& operator >> (std::istream& is, var& var)

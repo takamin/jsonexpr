@@ -104,7 +104,8 @@ namespace json {
                     case ',':
                         if(flush) {
                             // add null element
-                            this->entity->push(Value());
+                            var null;
+                            this->entity->push(null);
                         }
                         flush = true;
                         break;
@@ -113,7 +114,7 @@ namespace json {
                             flush = false;
                             is.unget();
                             value.parse(is);
-                            this->entity->push(*value.getEntity());
+                            this->entity->push(value);
                         } else {
                             throw invalid_argument("array element not end by comma.");
                         }
