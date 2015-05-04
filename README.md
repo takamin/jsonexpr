@@ -1,14 +1,74 @@
 jsonXX
 ======
 
-これはC++でJSONを扱うためのクラスライブラリです。
+C++でJSONを扱うためのクラスライブラリです。
 
-This is a C++ class library to operate JSON.
+jsonXX::Varクラスでjavascriptの基本データ型(数値、文字列、配列、オブジェクト)
+を表現しており、JSONデータのストリーム入出力機能を提供します。
 
-## 機能概要
+## データ型
 
-* javascriptの基本的なデータ表現(数値、文字列、配列、オブジェクト)
-* JSON形式の文字列との相互変換
+1. 数値 - double型の数値
+2. 文字列 - std::string型の文字列
+3. 配列 - jsonXX::Var型の配列
+4. オブジェクト - 文字列からjsonXX::Var型へのディクショナリ
+
+## 初期化
+
+コンストラクタにJson形式の文字列を与えて初期化できます。
+
+```
+//数値の初期化(内部表現は全てdouble)
+jsonXX::Var real("-1.234e+5");  //浮動小数点
+jsonXX::Var dec("1234");        //10進整数
+jsonXX::Var hex("0x1234");      //16進整数
+jsonXX::Var oct("0644");        //8進整数
+
+//文字列で初期化
+jsonXX::Var str("'string'");    //シングルクォート
+
+//配列の初期化
+jsonXX::Var arr("[-1.234e+5,'string']");
+
+//オブジェクトの初期化
+jsonXX::Var obj("{'key':'value', foo: 'bar', arr:[1,2,3,4]}");
+```
+
+## 参照
+
+数値型は、doubleへのキャスト、文字列型は、std::string&へのキャストで値を参照できます。
+
+配列の要素は、operator[](int)、オブジェクトの値は、operator[](const std::string&)によって参照します。
+
+## 代入
+
+```
+data = 1.234;           //数値を代入
+data = "string";        //文字列を代入
+arr[3] = 1.234;         //配列要素の書き換え
+obj["key"] = 1.234;     //オブジェクト要素の書き換え
+obj["new key"] = arr;   //オブジェクトへ新たな項目を追加
+```
+
+## JSONデータのストリーム入出力
+
+C++標準のストリームに対する入出力機能を提供しています。
+
+### JSONの読み込み
+
+```
+jsonXX::Var dataobj;
+ifstream is("input.json");
+is >> dataobj;
+```
+
+### JSONの出力
+
+```
+jsonXX::Var dataobj;
+ofstream is("output.json");
+os << dataobj;
+```
 
 ## 制限事項
 
@@ -21,7 +81,7 @@ javascriptの仕様に完全準拠しているわけではありません。
 * オブジェクトのキーは文字列だけです。
 * 数値はdoubleだけです。
 
-## 使い方サンプル
+## サンプル
 
 ```
     // json 文字列からの構築
@@ -30,9 +90,7 @@ javascriptの仕様に完全準拠しているわけではありません。
     jsonXX::Var arr("[ \"key\", 'str', 'hex', 0xABCD, 0777 ]");
     jsonXX::Var obj("{ foo : 'bar', 'boo':1.2345e-6, 'arr': [0,1,2,3]}");
 
-    //
     // 参照
-    //
     double numval = num;
     string strval = str;
     cout << numval << endl;
@@ -47,9 +105,7 @@ javascriptの仕様に完全準拠しているわけではありません。
     strval = (string)obj["arr"][2];
     cout << strval << endl;
 
-    //
     // 配列の扱い
-    //
     cout << "arr.length() = " << arr.length() << endl;
     arr.push(9.876);
     arr.push("string element");
@@ -94,21 +150,3 @@ javascriptの仕様に完全準拠しているわけではありません。
     num["arr"][1] = "change by reference";
     cout << num["arr"][1] << endl;
 ```
-
-### 宣言
-
-
-
-### JSONの読み込み
-
-jsonを読み込むには、
-
-
-namespace jsonXX
-
-* class jsonXX::Data - abstract base class
-* class jsonXX::Value : public jsonXX::Data - scalar data, number or string.(no Function)
-* class jsonXX::Array : public jsonXX::Data - array of jsonXX::Data
-* class jsonXX::Object : public jsonXX::Data - object containing jsonXX::Data mapped by string as key.
-
-
