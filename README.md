@@ -38,7 +38,17 @@ jsonXX::Var obj("{'key':'value', foo: 'bar', arr:[1,2,3,4]}");
 
 数値型は、doubleへのキャスト、文字列型は、std::string&へのキャストで値を参照できます。
 
-配列の要素は、operator[](int)、オブジェクトの値は、operator[](const std::string&)によって参照します。
+配列の要素は、operator\[\]\(int\)、オブジェクトの値は、operator\[\]\(const std::string&\)によって参照します。
+
+```
+double v = (double)real;
+std::string s = (const std::string&)str;
+v = arr[3];             //配列要素の参照
+v = obj["arr"][0];      //オブジェクト内の配列要素の参照
+```
+
+内部表現と矛盾する参照を行うと、例外が投入されます。
+
 
 ## 代入
 
