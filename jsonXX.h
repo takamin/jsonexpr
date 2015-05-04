@@ -23,7 +23,6 @@ namespace json {
                 TypeString = 3,
                 TypeArray = 4,
                 TypeObject = 5, };
-            static var Null;
         public:
             var();
             var(const std::string& json);
@@ -201,7 +200,10 @@ namespace json {
             }
             void assertValidIndex(int index) const {
                 if(index < 0 || value.size() <= index) {
-                    throw new std::out_of_range("json::Array index out of range.");
+                    std::stringstream ss;
+                    ss << "index " << index << " out of range. " <<
+                        "Array length == " << value.size() << ".";
+                    throw new std::out_of_range(ss.str());
                 }
             }
         private:
@@ -256,12 +258,19 @@ namespace json {
                 value.insert(item);
             }
             const var& get(const std::string& key) const {
-                const var* p = getValuePtr(key);
-                return (p) ? *p : var::Null;
+                this->assertExistsKey(key);
+                return *this->getValuePtr(key);
             }
             var& get(const std::string& key) {
-                var* p = getValuePtr(key);
-                return (p) ? *p : var::Null;
+                this->assertExistsKey(key);
+                return *this->getValuePtr(key);
+            }
+            void assertExistsKey(const std::string& key) const {
+                if(!this->exists(key)) {
+                    std::stringstream ss;
+                    ss << "key " << key << " not found ";
+                    throw std::out_of_range(ss.str());
+                }
             }
             const var* getValuePtr(const std::string& key) const {
                 ((Object*)this)->getValuePtr(key);

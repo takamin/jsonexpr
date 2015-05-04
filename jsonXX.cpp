@@ -2,7 +2,6 @@
 #include "jsonXX.h"
 namespace json {
     using namespace std;
-    var var::Null;
 
     //
     // class var
