@@ -598,6 +598,48 @@ void test() {
         ASSERT_EQ(var["ABC"], "DEF");
         ASSERT_EQ(var["JKL"], 1.23);
     }
+    {
+        json::var var("['ABC','XYZ'\n,'DEF',\n'GHI','JKL']");
+        var.remove(3);
+        var.remove(1);
+        ASSERT_EQ(var[0], "ABC");
+        ASSERT_EQ(var[1], "DEF");
+        ASSERT_EQ(var[2], "JKL");
+    }
+    {
+        json::var var("{'ABC':'XYZ',DEF:[],'JKL':/**/\r\n1.23}");
+        var.remove("ABC");
+        var.remove("JKL");
+        ASSERT_EQ(var.exists("ABC"), false);
+        ASSERT_EQ(var.exists("DEF"), true);
+        ASSERT_EQ(var.exists("JKL"), false);
+    }
+    {
+        json::var var("{'ABC':'XYZ',DEF:[],'JKL':/**/\r\n1.23}");
+        json::var keys = var.keys();
+        ASSERT_EQ(keys.length(), 3);
+        bool key_ABC_exists = false;
+        bool key_DEF_exists = false;
+        bool key_JKL_exists = false;
+        for(int i = 0; i < keys.length(); i++) {
+            if(keys[i] == string("ABC")) {
+                key_ABC_exists = true;
+            }
+        }
+        for(int i = 0; i < keys.length(); i++) {
+            if(keys[i] == string("DEF")) {
+                key_DEF_exists = true;
+            }
+        }
+        for(int i = 0; i < keys.length(); i++) {
+            if(keys[i] == string("JKL")) {
+                key_JKL_exists = true;
+            }
+        }
+        ASSERT_EQ(key_ABC_exists, true);
+        ASSERT_EQ(key_DEF_exists, true);
+        ASSERT_EQ(key_JKL_exists, true);
+    }
 }
 int main(int argc, char* argv[]) {
     try {
