@@ -122,6 +122,9 @@ namespace json {
         public:
             std::ostream& writeJson(std::ostream& os) const {
                 switch(getType()) {
+                    case var::TypeNull:
+                        os << "null";
+                        break;
                     case var::TypeNumber:
                         os << str2num(value);
                         break;

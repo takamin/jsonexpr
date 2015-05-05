@@ -168,8 +168,11 @@ namespace json {
     }
     const void var::writeJson(std::ostream& os) const
     {
-        this->assertEntityNotNull();
-        this->entity->writeJson(os);
+        if(this->entity == 0) {
+            os << "null";
+        } else {
+            this->entity->writeJson(os);
+        }
     }
     void var::assertEntityTypeEquals(var::Type type) const
     {

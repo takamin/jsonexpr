@@ -84,8 +84,16 @@ namespace json {
                 break;
             default:
                 is.unget();
-                this->assign(new Value());
-                this->parseNumber(is);
+                if(c == '_' || isalpha(c)) {
+                    var id("");
+                    id.parseIdentifier(is);
+                    if(id.entity->getString() == "null") {
+                        this->assign(new Value());
+                    }
+                } else {
+                    this->assign(new Value());
+                    this->parseNumber(is);
+                }
                 skip_whitespace(is);
                 break;
         }
