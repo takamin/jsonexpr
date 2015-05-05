@@ -598,6 +598,22 @@ void test() {
         ASSERT_EQ(var["ABC"], "DEF");
         ASSERT_EQ(var["JKL"], 1.23);
     }
+    {
+        json::var null("null");
+        json::var arr("[null,0,null]");
+        json::var obj("{A:null,B:'',C:null}");
+        ASSERT_EQ(null.getType(), json::var::TypeNull);
+        ASSERT_EQ(arr[0].getType(), json::var::TypeNull);
+        ASSERT_EQ(arr[1].getType(), json::var::TypeNumber);
+        ASSERT_EQ(arr[2].getType(), json::var::TypeNull);
+        ASSERT_EQ(obj["A"].getType(), json::var::TypeNull);
+        ASSERT_EQ(obj["B"].getType(), json::var::TypeString);
+        ASSERT_EQ(obj["C"].getType(), json::var::TypeNull);
+
+        stringstream ss;
+        ss << null;
+        ASSERT_EQ(ss.str(), "null");
+    }
 }
 int main(int argc, char* argv[]) {
     try {
