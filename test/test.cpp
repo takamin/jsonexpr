@@ -563,6 +563,41 @@ void test() {
     } catch (exception& e) {
         cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
+    {
+        json::var var("1.23/* 4.56 */");
+        ASSERT_EQ(var, 1.23);
+    }
+    {
+        json::var var("/* 1.23 */7.89");
+        ASSERT_EQ(var, 7.89);
+    }
+    {
+        json::var var("/*1.23*/4.56/*7.89*/");
+        ASSERT_EQ(var, 4.56);
+    }
+    {
+        json::var var("1.23//9.87");
+        ASSERT_EQ(var, 1.23);
+    }
+    {
+        json::var var("//1.23\r\n9.87");
+        ASSERT_EQ(var, 9.87);
+    }
+    {
+        json::var var("'ABC'//'XYZ'");
+        ASSERT_EQ(var, "ABC");
+    }
+    {
+        json::var var("['ABC'//'XYZ'\n,'DEF',\n/*GHI*/'JKL']");
+        ASSERT_EQ(var[0], "ABC");
+        ASSERT_EQ(var[1], "DEF");
+        ASSERT_EQ(var[2], "JKL");
+    }
+    {
+        json::var var("{'ABC'://'XYZ'\n'DEF',/*\r\nGHI\r\n*/'JKL':/**/\r\n1.23}");
+        ASSERT_EQ(var["ABC"], "DEF");
+        ASSERT_EQ(var["JKL"], 1.23);
+    }
 }
 int main(int argc, char* argv[]) {
     try {

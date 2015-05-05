@@ -53,7 +53,6 @@ namespace json {
         private:
             void assign(VarEntity* entity);
             void parseObject(std::istream& is);
-            void parseObjectKey(std::istream& is);
             void parseArray(std::istream& is);
             void parseIdentifier(std::istream& is);
             void parseString(std::istream& is);

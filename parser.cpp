@@ -6,33 +6,87 @@
 #include "jsonXX.h"
 namespace json {
     using namespace std;
-    void var::parse(istream& is)
+    /*!
+     * ignore stream to the end of line.
+     */
+    static void skip_to_eol(istream& is)
     {
         int c;
         while((c = is.get()) != EOF) {
-            if(!isspace(c)) {
+            if(c == '\n') {
                 break;
             }
         }
-        switch(c) {
+    }
+    /*!
+     * ignore stream to the end of C style comment.
+     */
+    static void skip_comment(istream& is)
+    {
+        int c;
+        int prev = 0;
+        while((c = is.get()) != EOF) {
+            if(prev == '*' && c == '/') {
+                break;
+            }
+            prev = c;
+        }
+    }
+    /*!
+     * skip whitespaces and comments in stream
+     */
+    static void skip_whitespace(istream& is)
+    {
+        int c;
+        while((c = is.get()) != EOF) {
+            if(c == '/') {
+                switch(c = is.get()) {
+                    case '/':
+                        skip_to_eol(is);
+                        break;
+                    case '*':
+                        skip_comment(is);
+                        break;
+                    default:
+                        is.unget();
+                        return;
+                        break;
+                }
+            } else if(!isspace(c)) {
+                is.unget();
+                break;
+            }
+        }
+    }
+    void var::parse(istream& is)
+    {
+        int c;
+        skip_whitespace(is);
+        switch(c = is.get()) {
             case '{':
+                skip_whitespace(is);
                 this->assign(new Object());
                 this->parseObject(is);
+                skip_whitespace(is);
                 break;
             case '[':
+                skip_whitespace(is);
                 this->assign(new Array());
                 this->parseArray(is);
+                skip_whitespace(is);
                 break;
             case '\"':
             case '\'':
                 is.unget();
                 this->assign(new Value());
                 this->parseString(is);
+                skip_whitespace(is);
                 break;
             default:
                 is.unget();
                 this->assign(new Value());
                 this->parseNumber(is);
+                skip_whitespace(is);
                 break;
         }
     }
@@ -41,52 +95,50 @@ namespace json {
         int c;
         bool flush = true;
         while((c = is.get()) != EOF) {
-            if(!isspace(c)) {
-                switch(c) {
-                    case '}':
-                        return;
-                        break;
-                    case ',':
-                        if(flush) {
-                            throw invalid_argument("key-value empty.");
-                        }
-                        flush = true;
-                        break;
-                    default:
-                        if(flush) {
-                            var key, value;
+            switch(c) {
+                cerr << endl;
+                case '}':
+                    return;
+                    break;
+                case ',':
+                    if(flush) {
+                        throw invalid_argument("key-value empty.");
+                    }
+                    flush = true;
+                    skip_whitespace(is);
+                    break;
+                default:
+                    if(flush) {
+                        var key, value;
+                        // read key
+                        if(c == '\"' || c == '\'') {
                             is.unget();
-                            key.parseObjectKey(is);
-                            value.parse(is);
-                            this->entity->set(key.entity->getString(), value);
-                            flush = false;
+                            key.parseString(is);
                         } else {
-                            throw invalid_argument("key-value value not end by comma.");
+                            is.unget();
+                            key.parseIdentifier(is);
                         }
-                        break;
-                }
-            }
-        }
-    }
-    void var::parseObjectKey(istream& is)
-    {
-        int c;
-        while((c = is.get()) != EOF) {
-            if(!isspace(c)) {
-                switch(c) {
-                    case ':':
-                        return;
-                        break;
-                    case '\"':
-                    case '\'':
-                        is.unget();
-                        this->parseString(is);
-                        break;
-                    default:
-                        is.unget();
-                        this->parseIdentifier(is);
-                        break;
-                }
+                        skip_whitespace(is);
+
+                        // read delimitor
+                        if((c = is.get()) != ':') {
+                            stringstream ss;
+                            ss << "key-value delimitor ':' not found.";
+                            if(isprint(c)) {
+                                ss << " but invalid char " << (char)c << " is there.";
+                            }
+                            throw invalid_argument(ss.str());
+                        }
+
+                        //read value
+                        value.parse(is);
+                        this->entity->set(key.entity->getString(), value);
+
+                        flush = false;
+                    } else {
+                        throw invalid_argument("key-value value not end by comma.");
+                    }
+                    break;
             }
         }
     }
@@ -96,30 +148,29 @@ namespace json {
         var value;
         bool flush = true;
         while((c = is.get()) != EOF) {
-            if(!isspace(c)) {
-                switch(c) {
-                    case ']':
-                        return;
-                        break;
-                    case ',':
-                        if(flush) {
-                            // add null element
-                            var null;
-                            this->entity->push(null);
-                        }
-                        flush = true;
-                        break;
-                    default:
-                        if(flush) {
-                            flush = false;
-                            is.unget();
-                            value.parse(is);
-                            this->entity->push(value);
-                        } else {
-                            throw invalid_argument("array element not end by comma.");
-                        }
-                        break;
-                }
+            switch(c) {
+                case ']':
+                    return;
+                    break;
+                case ',':
+                    if(flush) {
+                        // add null element
+                        var null;
+                        this->entity->push(null);
+                    }
+                    flush = true;
+                    skip_whitespace(is);
+                    break;
+                default:
+                    if(flush) {
+                        flush = false;
+                        is.unget();
+                        value.parse(is);
+                        this->entity->push(value);
+                    } else {
+                        throw invalid_argument("array element not end by comma.");
+                    }
+                    break;
             }
         }
     }
