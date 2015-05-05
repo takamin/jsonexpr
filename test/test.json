@@ -1,0 +1,16 @@
+{
+// sample json
+    "arr":[0,'1',2,3,]/**** ** / ** *******/,
+    'obj':{"ABCDEFG":'HIJKLMN',
+        "arr":[
+            "XXX",
+            0xffff, // hex
+            0x7FFF, // hex
+            077     /*octal*/
+        ]
+    },
+    num:
+        //comment ------ */
+                    +1.23E-3,
+    str:'XYZ',
+}
