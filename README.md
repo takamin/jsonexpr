@@ -34,11 +34,47 @@ json::var arr("[-1.234e+5,'string']");
 json::var obj("{'key':'value', foo: 'bar', arr:[1,2,3,4]}");
 ```
 
-## 参照
+## 配列操作のメソッド
+
+1. length() - 要素数を得る
+2. push(値) - 要素の追加。値は数値、文字列、配列、オブジェクト
+3. remove(index) - 要素の削除。
+
+
+```
+json::var arr("[]");//空の配列
+arr.push(1.0);      //数値を追加
+arr.push("string"); //文字列を追加
+for(int i = 0; i < arr.length(); i++) {
+    cout << arr[i];
+}
+```
+
+## オブジェクト操作メソッド
+
+1. exists(key) - キーの有無を調べる
+2. keys() - キーの配列を返す。
+3. remove(key) - キーの削除。
+
+新たなキーに値を関連付けるには、\[\]で直接代入します。
+※ 定数でないoperator`[](const std::string&)`では、参照するだけでキーが作成されることに注意。
+
+```
+json::var obj("{}");    //空のオブジェクト
+obj["A"] = "B";         //文字列の値を追加
+obj["R"] = arr;         //既にある配列のコピーを追加
+json::var keys = obj.keys();
+for(int i = 0; i < keys.length(); i++) {
+    cout << "#" << keys[i] << " => " << obj[(const std::string&)keys[i]] << endl;
+}
+```
+
+## 値の参照
 
 数値型は、doubleへのキャスト、文字列型は、std::string&へのキャストで値を参照できます。
 
-配列の要素は、operator\[\]\(int\)、オブジェクトの値は、operator\[\]\(const std::string&\)によって参照します。
+配列要素とオブジェクトの値は共に、\[\]を使用して参照します。
+ネストしたオブジェクトは二次元配列のように\[\]をつないで参照します。
 
 ```
 double v = (double)real;
@@ -50,7 +86,7 @@ v = obj["arr"][0];      //オブジェクト内の配列要素の参照
 内部表現と矛盾する参照を行うと、例外が投入されます。
 
 
-## 代入
+## 値の代入
 
 ```
 data = 1.234;           //数値を代入
@@ -64,7 +100,7 @@ obj["new key"] = arr;   //オブジェクトへ新たな項目を追加
 
 C++標準のストリームに対する入出力機能を提供しています。
 
-### JSONの読み込み
+### std::istream からのJSONの読み込み
 
 ```
 json::var dataobj;
@@ -72,7 +108,7 @@ ifstream is("input.json");
 is >> dataobj;
 ```
 
-### JSONの出力
+### std::ostreamへのJSON出力
 
 ```
 json::var dataobj;
@@ -87,7 +123,6 @@ javascriptの仕様に完全準拠しているわけではありません。
 * nullを扱えません。
 * NaNを扱えません。
 * Functionを扱えません。
-* 読み込むJSONにコメントが含まれていてはいけません。
 * オブジェクトのキーは文字列だけです。
 * 数値はdoubleだけです。
 
