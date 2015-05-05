@@ -7,11 +7,11 @@ namespace json {
     // class var
     //
     var::var()
-        : entity(new Value())
+        : entity(0)
     {
     }
     var::var(const std::string& json)
-        : entity(new Value())
+        : entity(0)
     {
         istringstream ss(json);
         ss >> *this;
@@ -22,6 +22,9 @@ namespace json {
     }
     var::Type var::getType() const
     {
+        if(this->entity == 0) {
+            return TypeNull;
+        }
         return this->entity->getType();
     }
     void var::assign(VarEntity* entity)
@@ -31,7 +34,7 @@ namespace json {
     }
     var& var::operator = (const var& var)
     {
-        this->assign(var.entity->clone());
+        this->assign((var.entity) ? var.entity->clone() : 0);
         return *this;
     }
     var& var::operator = (double value)
@@ -62,47 +65,75 @@ namespace json {
     }
     var::operator double() const
     {
+        this->assertEntityNotNull();
+        Type type = this->getType();
+        if(type != TypeNumber && type != TypeString ) {
+            stringstream ss;
+            ss << "entity is not number or string, but " << type;
+            throw std::domain_error(ss.str());
+        }
         return this->entity->getNumber();
     }
     var::operator const std::string&() const
     {
+        this->assertEntityNotNull();
+        Type type = this->getType();
+        if(type != TypeNumber && type != TypeString ) {
+            stringstream ss;
+            ss << "entity is not number or string, but " << type;
+            throw std::domain_error(ss.str());
+        }
         return this->entity->getString();
     }
     int var::length() const
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
         return this->entity->size();
     }
     void var::push(double value)
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
         var data;
         data = value;
         this->entity->push(data);
     }
     void var::push(const std::string& value)
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
         var data;
         data = value;
         this->entity->push(data);
     }
     void var::push(const var& value)
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
         this->entity->push(value);
     }
     var& var::operator [](int index)
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
         return this->entity->get(index);
     }
     const var& var::operator [](int index) const
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
         return this->entity->get(index);
     }
     bool var::exists(const std::string& key) const
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeObject);
         return this->entity->exists(key);
     }
     var& var::operator [](const std::string& key)
     {
-        if(this->entity->getType() != var::TypeObject) {
+        if(this->getType() != var::TypeObject) {
             this->assign(new Object());
         }
         if(!this->entity->exists(key)) {
@@ -111,13 +142,30 @@ namespace json {
         }
         return this->entity->get(key);
     }
-    const void var::writeJson(std::ostream& os) const
-    {
-        this->entity->writeJson(os);
-    }
     const var& var::operator [](const std::string& key) const
     {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeObject);
         return this->entity->get(key);
+    }
+    const void var::writeJson(std::ostream& os) const
+    {
+        this->assertEntityNotNull();
+        this->entity->writeJson(os);
+    }
+    void var::assertEntityTypeEquals(var::Type type) const
+    {
+        if(this->getType() != type) {
+            stringstream ss;
+            ss << "entity type is not " << type << ", but " << this->getType();
+            throw std::domain_error(ss.str());
+        }
+    }
+    void var::assertEntityNotNull() const
+    {
+        if(this->entity == 0) {
+            throw std::domain_error("reference null object.");
+        }
     }
     std::ostream& operator << (std::ostream& os, const var& var)
     {

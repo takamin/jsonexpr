@@ -115,8 +115,7 @@ void sample() {
     num["arr"][1] = "change by reference";
     cout << num["arr"][1] << endl;
 }
-int main(int argc, char* argv[]) {
-
+void test() {
     sample();
 
     json::var value;
@@ -340,8 +339,8 @@ int main(int argc, char* argv[]) {
         istringstream ss(".0");
         obj.parse(ss);
         ASSERT_EQ(obj, 0.0);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -349,8 +348,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("0.");
         obj.parse(ss);
         ASSERT_EQ(obj, 0.0);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -358,8 +357,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("+1.2E-6");
         obj.parse(ss);
         ASSERT_EQ(obj, 1.2E-6);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -367,8 +366,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("-1.2e6");
         obj.parse(ss);
         ASSERT_EQ(obj, -1.2e6);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -376,8 +375,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("-1.2E+6");
         obj.parse(ss);
         ASSERT_EQ(obj, -1.2E+6);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -385,8 +384,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("0xef01");
         obj.parse(ss);
         ASSERT_EQ(obj, (double)0xef01);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -394,8 +393,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("-0x89AB");
         obj.parse(ss);
         ASSERT_EQ(obj, (double)-0x89AB);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -403,8 +402,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("0123");
         obj.parse(ss);
         ASSERT_EQ(obj, (double)0123);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -412,8 +411,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("-0670");
         obj.parse(ss);
         ASSERT_EQ(obj, (double)-0670);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse array
@@ -425,8 +424,8 @@ int main(int argc, char* argv[]) {
         ASSERT_EQ(obj[2], 2.0);
         ASSERT_EQ(obj[3], 3.0);
         ASSERT_EQ(obj.length(), 4);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse object
@@ -434,8 +433,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("{key:'value'}");
         obj.parse(ss);
         ASSERT_EQ(obj["key"], string("value"));
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse object
@@ -443,8 +442,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("{\"key\":'value'}");
         obj.parse(ss);
         ASSERT_EQ(obj["key"], string("value"));
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse object
@@ -452,8 +451,8 @@ int main(int argc, char* argv[]) {
         istringstream ss("{'key':'value'}");
         obj.parse(ss);
         ASSERT_EQ(obj["key"], string("value"));
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse array
@@ -465,8 +464,8 @@ int main(int argc, char* argv[]) {
         ASSERT_EQ(obj[1], "No.1");
         ASSERT_EQ(obj[2], -2e2);
         ASSERT_EQ(obj[3]["last"], string("element"));
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse number
@@ -477,8 +476,8 @@ int main(int argc, char* argv[]) {
         ASSERT_EQ(obj["array"][1], 1.0);
         ASSERT_EQ(obj["array"][2], 2.0);
         ASSERT_EQ(obj["number key"], 1.23);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse array
@@ -496,8 +495,8 @@ int main(int argc, char* argv[]) {
         ASSERT_EQ(obj2[1], "No.1");
         ASSERT_EQ(obj2[2], -2e2);
         ASSERT_EQ(obj2[3]["last"], string("element"));
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         // var::parse object
@@ -514,8 +513,8 @@ int main(int argc, char* argv[]) {
         ASSERT_EQ(obj2["array"][1], 1.0);
         ASSERT_EQ(obj2["array"][2], 2.0);
         ASSERT_EQ(obj2["number key"], 1.23);
-    } catch (invalid_argument& e) {
-        cerr << e.what() << endl;
+    } catch (exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     {
         json::var var;
@@ -540,13 +539,13 @@ int main(int argc, char* argv[]) {
         json::var array("[0,1,2,3]");
         ASSERT_EQ(array.getType(), json::var::TypeArray);
     } catch (exception& e) {
-        cerr << e.what() << endl;
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         json::var object("{a:0,b:'1',c:2,d:'3'}");
         ASSERT_EQ(object.getType(), json::var::TypeObject);
     } catch (exception& e) {
-        cerr << e.what() << endl;
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         json::var var;
@@ -554,7 +553,7 @@ int main(int argc, char* argv[]) {
         var["c"] = array;
         ASSERT_EQ(var["c"][3], 3.0);
     } catch (exception& e) {
-        cerr << e.what() << endl;
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     try {
         json::var var;
@@ -562,7 +561,14 @@ int main(int argc, char* argv[]) {
         var["d"] = object;
         ASSERT_EQ(var["d"]["d"], "3");
     } catch (exception& e) {
-        cerr << e.what() << endl;
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
+    }
+}
+int main(int argc, char* argv[]) {
+    try {
+        test();
+    } catch(exception& e) {
+        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
     }
     report();
     return (count_fail > 0) ? -1 : 0;

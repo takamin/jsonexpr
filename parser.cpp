@@ -133,6 +133,7 @@ namespace json {
                 ss << (char)c;
             } else {
                 is.unget();
+                this->assign(new Value());
                 this->entity->setString(ss.str());
                 break;
             }
@@ -154,6 +155,7 @@ namespace json {
             switch(c) {
                 case '\"':
                     if(double_quote) {
+                        this->assign(new Value());
                         this->entity->setString(ss.str());
                         return;
                     } else {
@@ -162,6 +164,7 @@ namespace json {
                     break;
                 case '\'':
                     if(!double_quote) {
+                        this->assign(new Value());
                         this->entity->setString(ss.str());
                         return;
                     } else {

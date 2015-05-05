@@ -58,6 +58,8 @@ namespace json {
             void parseIdentifier(std::istream& is);
             void parseString(std::istream& is);
             void parseNumber(std::istream& is);
+            void assertEntityTypeEquals(Type type) const;
+            void assertEntityNotNull() const;
         private:
             VarEntity* entity;
     };
