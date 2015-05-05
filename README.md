@@ -65,7 +65,7 @@ obj["A"] = "B";         //文字列の値を追加
 obj["R"] = arr;         //既にある配列のコピーを追加
 json::var keys = obj.keys();
 for(int i = 0; i < keys.length(); i++) {
-    cout << "#" << keys[i] << " => " << obj[(const std::string&)keys[i]] << endl;
+    cout << "#" << keys[i] << " => " << obj[keys[i]] << endl;
 }
 ```
 
