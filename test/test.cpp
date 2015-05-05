@@ -598,6 +598,22 @@ void test() {
         ASSERT_EQ(var["ABC"], "DEF");
         ASSERT_EQ(var["JKL"], 1.23);
     }
+    {
+        json::var var("['ABC','XYZ'\n,'DEF',\n'GHI','JKL']");
+        var.remove(3);
+        var.remove(1);
+        ASSERT_EQ(var[0], "ABC");
+        ASSERT_EQ(var[1], "DEF");
+        ASSERT_EQ(var[2], "JKL");
+    }
+    {
+        json::var var("{'ABC':'XYZ',DEF:[],'JKL':/**/\r\n1.23}");
+        var.remove("ABC");
+        var.remove("JKL");
+        ASSERT_EQ(var.exists("ABC"), false);
+        ASSERT_EQ(var.exists("DEF"), true);
+        ASSERT_EQ(var.exists("JKL"), false);
+    }
 }
 int main(int argc, char* argv[]) {
     try {

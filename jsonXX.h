@@ -42,10 +42,12 @@ namespace json {
             void push(double value);
             void push(const std::string& value);
             void push(const var& value);
+            void remove(int index);
             var& operator [](int index);
             const var& operator [](int index) const;
             
             bool exists(const std::string& key) const;
+            void remove(const std::string& key);
             var& operator [](const std::string& key);
             const var& operator [](const std::string& key) const;
         public:
@@ -85,10 +87,12 @@ namespace json {
             virtual const std::string& getString() const { throw new std::runtime_error("getString called, but this is NOT json::Value."); }
             virtual int size() { throw new std::runtime_error("size called, but this is NOT json::Array."); }
             virtual int push(const var& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
+            virtual void remove(int index) { throw new std::runtime_error("remove(index) called, but this is NOT json::Array."); }
             virtual const var& get(int index) const { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual int set(const std::string& key, const var& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
             virtual bool exists(const std::string& key) const { throw new std::runtime_error("exists(key) called, but this is NOT json::Object."); }
+            virtual void remove(const std::string& key) { throw new std::runtime_error("remove(key) called, but this is NOT json::Object."); }
             virtual const var& get(const std::string& key) const { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
             virtual var& get(const std::string& key) { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
         private:
@@ -191,6 +195,12 @@ namespace json {
                 *v = item;
                 value.push_back(v);
             }
+            void remove(int index) {
+                assertValidIndex(index);
+                std::vector<var*>::iterator item = this->value.begin();
+                item += index;
+                this->value.erase(item);
+            }
             const var& get(int index) const {
                 assertValidIndex(index);
                 return *(this->value[index]);
@@ -247,12 +257,16 @@ namespace json {
             bool exists(const std::string& key) const {
                 return getValuePtr(key) != 0;
             }
-            int set(const std::string& key, const var& data) {
+            void remove(const std::string& key)
+            {
                 std::map<std::string, var*>::iterator it = value.find(key);
                 if(it != value.end()) {
                     delete it->second;
                     value.erase(it);
                 }
+            }
+            int set(const std::string& key, const var& data) {
+                this->remove(key);
                 var* v = new var();
                 *v = data;
                 std::pair<std::string, var*> item(key, v);

@@ -113,6 +113,12 @@ namespace json {
         this->assertEntityTypeEquals(TypeArray);
         this->entity->push(value);
     }
+    void var::remove(int index)
+    {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeArray);
+        this->entity->remove(index);
+    }
     var& var::operator [](int index)
     {
         this->assertEntityNotNull();
@@ -130,6 +136,12 @@ namespace json {
         this->assertEntityNotNull();
         this->assertEntityTypeEquals(TypeObject);
         return this->entity->exists(key);
+    }
+    void var::remove(const std::string& key)
+    {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeObject);
+        this->entity->remove(key);
     }
     var& var::operator [](const std::string& key)
     {
