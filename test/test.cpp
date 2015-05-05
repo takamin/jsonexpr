@@ -624,16 +624,19 @@ void test() {
         for(int i = 0; i < keys.length(); i++) {
             if(keys[i] == string("ABC")) {
                 key_ABC_exists = true;
+                ASSERT_EQ(var[keys[i]], (string)"XYZ");
             }
         }
         for(int i = 0; i < keys.length(); i++) {
             if(keys[i] == string("DEF")) {
                 key_DEF_exists = true;
+                ASSERT_EQ(var[keys[i]].length(), 0);
             }
         }
         for(int i = 0; i < keys.length(); i++) {
             if(keys[i] == string("JKL")) {
                 key_JKL_exists = true;
+                ASSERT_EQ(var[keys[i]], 1.23);
             }
         }
         ASSERT_EQ(key_ABC_exists, true);

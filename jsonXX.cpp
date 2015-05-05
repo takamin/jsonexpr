@@ -166,6 +166,25 @@ namespace json {
         this->assertEntityTypeEquals(TypeObject);
         return this->entity->get(key);
     }
+    var& var::operator [](const var& key)
+    {
+        switch(this->getType()) {
+            case TypeArray:
+                return this->operator[]((double)key);
+                break;
+            case TypeObject:
+                return this->operator[]((const string&)key);
+                break;
+        }
+        stringstream ss;
+        ss << "entity type is not Array or Object, but " << this->getType();
+        throw std::domain_error(ss.str());
+        return *this;//dummy;
+    }
+    const var& var::operator [](const var& key) const
+    {
+        return ((var*)this)->operator[](key);
+    }
     const void var::writeJson(std::ostream& os) const
     {
         if(this->entity == 0) {

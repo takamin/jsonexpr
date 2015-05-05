@@ -51,6 +51,9 @@ namespace json {
             void remove(const std::string& key);
             var& operator [](const std::string& key);
             const var& operator [](const std::string& key) const;
+
+            var& operator [](const var& key);
+            const var& operator [](const var& key) const;
         public:
             const void writeJson(std::ostream& os) const;
         private:
