@@ -137,6 +137,12 @@ namespace json {
         this->assertEntityTypeEquals(TypeObject);
         return this->entity->exists(key);
     }
+    var var::keys() const
+    {
+        this->assertEntityNotNull();
+        this->assertEntityTypeEquals(TypeObject);
+        return this->entity->keys();
+    }
     void var::remove(const std::string& key)
     {
         this->assertEntityNotNull();

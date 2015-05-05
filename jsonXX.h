@@ -47,6 +47,7 @@ namespace json {
             const var& operator [](int index) const;
             
             bool exists(const std::string& key) const;
+            var keys() const;
             void remove(const std::string& key);
             var& operator [](const std::string& key);
             const var& operator [](const std::string& key) const;
@@ -92,6 +93,7 @@ namespace json {
             virtual var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual int set(const std::string& key, const var& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
             virtual bool exists(const std::string& key) const { throw new std::runtime_error("exists(key) called, but this is NOT json::Object."); }
+            virtual var keys() const { throw new std::runtime_error("keys() called, but this is NOT json::Object."); }
             virtual void remove(const std::string& key) { throw new std::runtime_error("remove(key) called, but this is NOT json::Object."); }
             virtual const var& get(const std::string& key) const { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
             virtual var& get(const std::string& key) { throw new std::runtime_error("get(key) called, but this is NOT json::Object."); }
@@ -271,6 +273,14 @@ namespace json {
                 *v = data;
                 std::pair<std::string, var*> item(key, v);
                 value.insert(item);
+            }
+            var keys() const {
+                var keys_array("[]");
+                std::map<std::string, var*>::const_iterator entry = value.begin();
+                for(; entry != this->value.end(); entry++) {
+                    keys_array.push(entry->first);
+                }
+                return keys_array;
             }
             const var& get(const std::string& key) const {
                 this->assertExistsKey(key);
