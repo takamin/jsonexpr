@@ -659,6 +659,17 @@ void test() {
         ss << null;
         ASSERT_EQ(ss.str(), "null");
     }
+    {
+        //
+        // issue #1
+        //
+        json::var num1("0.1");
+        ASSERT_EQ(num1, 0.1);
+        json::var num2("-0.401");
+        ASSERT_EQ(num2, -0.401);
+        json::var arr("[-0.123]");
+        ASSERT_EQ(arr[0], -0.123);
+    }
 }
 int main(int argc, char* argv[]) {
     try {

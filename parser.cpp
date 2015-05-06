@@ -266,9 +266,11 @@ namespace json {
                 ss << '0';
                 ss << "x";
                 radix = 16;
-            } else {
+            } else if('0' <= c && c <= '7') {
                 ss << '0';
                 radix = 8;
+                is.unget();
+            } else {
                 is.unget();
             }
         } else {
