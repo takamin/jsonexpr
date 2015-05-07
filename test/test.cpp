@@ -345,15 +345,6 @@ void test() {
     try {
         // var::parse number
         json::var obj;
-        istringstream ss("0.");
-        obj.parse(ss);
-        ASSERT_EQ(obj, 0.0);
-    } catch (exception& e) {
-        cerr << "EXCEPTION CAUGHT: " << e.what() << endl;
-    }
-    try {
-        // var::parse number
-        json::var obj;
         istringstream ss("+1.2E-6");
         obj.parse(ss);
         ASSERT_EQ(obj, 1.2E-6);
@@ -708,11 +699,8 @@ void test() {
                 "0,0,1,0,0]},{\"inp\":[0,1,1,1,0,1,0,0,0,1,1,0,0,0,1,0,1,1,1,0,1,0,0,0,1,1,0,0,0,1,0,1,1,1,0],\""
                 "out\":[0,0,0,0,0,0,0,0,1,0]},{\"inp\":[0,1,1,1,0,1,0,0,0,1,1,0,0,0,1,0,1,1,1,1,0,0,0,0,1,1,0,0,"
                 "0,1,0,1,1,1,0],\"out\":[0,0,0,0,0,0,0,0,0,1]}]}");
-        cerr << "------" << endl;
         ASSERT_EQ(j["layer"]["inp-count"], 35);
-        cerr << "------" << endl;
         ASSERT_EQ(j["layer"]["mid-count"], 50);
-        cerr << "------" << endl;
         ASSERT_EQ(j["layer"]["out-count"], 10);
     }
 
