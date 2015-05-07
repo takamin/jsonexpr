@@ -90,13 +90,9 @@ namespace json {
                     if(id.entity->getString() == "null") {
                         this->assign(new Value());
                     } else if(id.entity->getString() == "true") {
-                        Value* bval = new Value();
-                        bval->setBool(true);
-                        this->assign(bval);
+                        *this = true;
                     } else if(id.entity->getString() == "false") {
-                        Value* bval = new Value();
-                        bval->setBool(false);
-                        this->assign(bval);
+                        *this = false;
                     }
                 } else {
                     this->assign(new Value());
@@ -112,7 +108,6 @@ namespace json {
         bool flush = true;
         while((c = is.get()) != EOF) {
             switch(c) {
-                cerr << endl;
                 case '}':
                     return;
                     break;
@@ -200,11 +195,11 @@ namespace json {
                 ss << (char)c;
             } else {
                 is.unget();
-                this->assign(new Value());
-                this->entity->setString(ss.str());
                 break;
             }
         }
+        this->assign(new Value());
+        this->entity->setString(ss.str());
     }
     void var::parseString(istream& is)
     {
