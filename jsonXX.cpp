@@ -37,6 +37,13 @@ namespace json {
         this->assign((var.entity) ? var.entity->clone() : 0);
         return *this;
     }
+    var& var::operator = (bool value)
+    {
+        Value* p = new Value();
+        p->setBool(value);
+        this->assign(p);
+        return *this;
+    }
     var& var::operator = (double value)
     {
         Value* p = new Value();
@@ -63,11 +70,22 @@ namespace json {
         this->assign(p);
         return *this;
     }
+    var::operator bool() const
+    {
+        this->assertEntityNotNull();
+        Type type = this->getType();
+        if(type != TypeBool && type != TypeNumber && type != TypeString ) {
+            stringstream ss;
+            ss << "entity is not number or string, but " << type;
+            throw std::domain_error(ss.str());
+        }
+        return this->entity->getBool();
+    }
     var::operator double() const
     {
         this->assertEntityNotNull();
         Type type = this->getType();
-        if(type != TypeNumber && type != TypeString ) {
+        if(type != TypeBool && type != TypeNumber && type != TypeString ) {
             stringstream ss;
             ss << "entity is not number or string, but " << type;
             throw std::domain_error(ss.str());
@@ -78,7 +96,7 @@ namespace json {
     {
         this->assertEntityNotNull();
         Type type = this->getType();
-        if(type != TypeNumber && type != TypeString ) {
+        if(type != TypeBool && type != TypeNumber && type != TypeString ) {
             stringstream ss;
             ss << "entity is not number or string, but " << type;
             throw std::domain_error(ss.str());
@@ -106,6 +124,9 @@ namespace json {
         var data;
         data = value;
         this->entity->push(data);
+    }
+    void var::push(const char* value) {
+        this->push(std::string(value));
     }
     void var::push(const var& value)
     {
@@ -136,6 +157,14 @@ namespace json {
         this->assertEntityNotNull();
         this->assertEntityTypeEquals(TypeObject);
         return this->entity->exists(key);
+    }
+    var& var::operator [](const char* key)
+    {
+        return this->operator[](std::string(key));
+    }
+    const var& var::operator [](const char* key) const
+    {
+        return this->operator[](std::string(key));
     }
     var var::keys() const
     {

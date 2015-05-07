@@ -19,6 +19,7 @@ namespace json {
         public:
             enum Type {
                 TypeNull = 0,
+                TypeBool = 1,
                 TypeNumber = 2,
                 TypeString = 3,
                 TypeArray = 4,
@@ -30,9 +31,11 @@ namespace json {
             void parse(std::istream& is);
             Type getType() const;
         public:
+            operator bool() const;
             operator double() const;
             operator const std::string&() const;
             var& operator = (const var& var);
+            var& operator = (bool value);
             var& operator = (double value);
             var& operator = (const char* value);
             var& operator = (const std::string& value);
@@ -41,6 +44,7 @@ namespace json {
             int length() const;
             void push(double value);
             void push(const std::string& value);
+            void push(const char* value);
             void push(const var& value);
             void remove(int index);
             var& operator [](int index);
@@ -51,6 +55,8 @@ namespace json {
             void remove(const std::string& key);
             var& operator [](const std::string& key);
             const var& operator [](const std::string& key) const;
+            var& operator [](const char* key);
+            const var& operator [](const char* key) const;
 
             var& operator [](const var& key);
             const var& operator [](const var& key) const;
@@ -85,6 +91,8 @@ namespace json {
             virtual std::ostream& writeJson(std::ostream& os) const = 0;
         private:
             virtual VarEntity* clone() const = 0;
+            virtual void setBool(bool value) { throw new std::runtime_error("setBool called, but this is NOT json::Value."); }
+            virtual bool getBool() const { throw new std::runtime_error("getBool called, but this is NOT json::Value."); }
             virtual void setNumber(double value) { throw new std::runtime_error("setNumber called, but this is NOT json::Value."); }
             virtual double getNumber() const { throw new std::runtime_error("getNumber called, but this is NOT json::Value."); }
             virtual void setString(const std::string& value) { throw new std::runtime_error("setString called, but this is NOT json::Value."); }
@@ -128,6 +136,9 @@ namespace json {
                     case var::TypeNull:
                         os << "null";
                         break;
+                    case var::TypeBool:
+                        os << value;
+                        break;
                     case var::TypeNumber:
                         os << str2num(value);
                         break;
@@ -151,6 +162,13 @@ namespace json {
                 this->value = num2str(value);
                 setType(var::TypeNumber); }
             double getNumber() const { return Value::str2num(value);
+            }
+            void setBool(bool value) {
+                this->value = value ? "true":"false";
+                setType(var::TypeBool);
+            }
+            bool getBool() const {
+                return ((this->value == std::string("true")) ? true : false);
             }
             static double str2num(const std::string& s) {
                 double value = 0.0;

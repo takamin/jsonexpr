@@ -670,6 +670,30 @@ void test() {
         json::var arr("[-0.123]");
         ASSERT_EQ(arr[0], -0.123);
     }
+    {   // bool
+        json::var bool_value;
+        ASSERT_EQ(bool_value.getType(), json::var::TypeNull);
+        bool_value = true;
+        ASSERT_EQ(bool_value.getType(), json::var::TypeBool);
+        ASSERT_EQ((bool)bool_value, true);
+        stringstream ss_true;
+        ss_true << bool_value;
+        ASSERT_EQ(ss_true.str(), "true");
+        bool_value = 0.123;
+        ASSERT_EQ(bool_value.getType(), json::var::TypeNumber);
+        bool_value = false;
+        ASSERT_EQ(bool_value.getType(), json::var::TypeBool);
+        ASSERT_EQ((bool)bool_value, false);
+        stringstream ss_false;
+        ss_false << bool_value;
+        ASSERT_EQ(ss_false.str(), "false");
+
+        json::var bool_value2(ss_true.str());
+        ASSERT_EQ((bool)bool_value2, true);
+        json::var bool_value3(ss_false.str());
+        ASSERT_EQ((bool)bool_value3, false);
+    }
+
 }
 int main(int argc, char* argv[]) {
     try {

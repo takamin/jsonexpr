@@ -89,6 +89,14 @@ namespace json {
                     id.parseIdentifier(is);
                     if(id.entity->getString() == "null") {
                         this->assign(new Value());
+                    } else if(id.entity->getString() == "true") {
+                        Value* bval = new Value();
+                        bval->setBool(true);
+                        this->assign(bval);
+                    } else if(id.entity->getString() == "false") {
+                        Value* bval = new Value();
+                        bval->setBool(false);
+                        this->assign(bval);
                     }
                 } else {
                     this->assign(new Value());
