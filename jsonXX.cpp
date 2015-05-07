@@ -82,6 +82,17 @@ namespace json {
         }
         return this->entity->getBool();
     }
+    var::operator int() const
+    {
+        this->assertEntityNotNull();
+        Type type = this->getType();
+        if(type != TypeBool && type != TypeNumber && type != TypeString ) {
+            stringstream ss;
+            ss << "entity is not number or string, but " << type;
+            throw std::domain_error(ss.str());
+        }
+        return (int)this->entity->getNumber();
+    }
     var::operator double() const
     {
         this->assertEntityNotNull();

@@ -32,6 +32,7 @@ namespace json {
             Type getType() const;
         public:
             operator bool() const;
+            operator int() const;
             operator double() const;
             operator const std::string&() const;
             var& operator = (const var& var);

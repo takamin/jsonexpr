@@ -703,6 +703,17 @@ void test() {
         ASSERT_EQ(j["layer"]["mid-count"], 50);
         ASSERT_EQ(j["layer"]["out-count"], 10);
     }
+    {
+        json::var value;
+        value = 1.5;
+        ASSERT_EQ((int)value, 1);
+        value = 2.4;
+        ASSERT_EQ((int)value, 2);
+        value = -1.5;
+        ASSERT_EQ((int)value, -1);
+        value = -2.4;
+        ASSERT_EQ((int)value, -2);
+    }
 
 }
 int main(int argc, char* argv[]) {
