@@ -3,6 +3,7 @@ project( jsonXX )
 set(LIB_SOURCES
     jsonXX.cpp
     parser.cpp
+    lex.cpp
     )
 set(TEST_SOURCES
     test/test.cpp
