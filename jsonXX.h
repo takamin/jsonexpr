@@ -99,11 +99,11 @@ namespace json {
             virtual void setString(const std::string& value) { throw new std::runtime_error("setString called, but this is NOT json::Value."); }
             virtual const std::string& getString() const { throw new std::runtime_error("getString called, but this is NOT json::Value."); }
             virtual int size() { throw new std::runtime_error("size called, but this is NOT json::Array."); }
-            virtual int push(const var& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
+            virtual void push(const var& item) { throw new std::runtime_error("push called, but this is NOT json::Array."); }
             virtual void remove(int index) { throw new std::runtime_error("remove(index) called, but this is NOT json::Array."); }
             virtual const var& get(int index) const { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
             virtual var& get(int index) { throw new std::runtime_error("get(index) called, but this is NOT json::Array."); }
-            virtual int set(const std::string& key, const var& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
+            virtual void set(const std::string& key, const var& data) { throw new std::runtime_error("set called, but this is NOT json::Object."); }
             virtual bool exists(const std::string& key) const { throw new std::runtime_error("exists(key) called, but this is NOT json::Object."); }
             virtual var keys() const { throw new std::runtime_error("keys() called, but this is NOT json::Object."); }
             virtual void remove(const std::string& key) { throw new std::runtime_error("remove(key) called, but this is NOT json::Object."); }
@@ -217,7 +217,7 @@ namespace json {
         private:
             VarEntity* clone() const { return new Array(*this); }
             int size() { return value.size(); }
-            int push(const var& item) {
+            void push(const var& item) {
                 var* v = new var();
                 *v = item;
                 value.push_back(v);
@@ -237,7 +237,7 @@ namespace json {
                 return *(this->value[index]);
             }
             void assertValidIndex(int index) const {
-                if(index < 0 || value.size() <= index) {
+                if(index < 0 || value.size() <= (size_t)index) {
                     std::stringstream ss;
                     ss << "index " << index << " out of range. " <<
                         "Array length == " << value.size() << ".";
@@ -292,7 +292,7 @@ namespace json {
                     value.erase(it);
                 }
             }
-            int set(const std::string& key, const var& data) {
+            void set(const std::string& key, const var& data) {
                 this->remove(key);
                 var* v = new var();
                 *v = data;
@@ -323,7 +323,7 @@ namespace json {
                 }
             }
             const var* getValuePtr(const std::string& key) const {
-                ((Object*)this)->getValuePtr(key);
+                return ((Object*)this)->getValuePtr(key);
             }
             var* getValuePtr(const std::string& key) {
                 std::map<std::string, var*>::iterator it = value.find(key);

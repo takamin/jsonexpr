@@ -193,6 +193,7 @@ void test() {
         ss << value;
         ASSERT_EQ(ss.str(), "\"\\\"A\\nB\\rC\\t\"");
     }
+#ifndef _MSC_VER
     {
         // utf-8 string
         json::var value;
@@ -201,6 +202,7 @@ void test() {
         ss << value;
         ASSERT_EQ(ss.str(), "\"自営損\"");
     }
+#endif
     {
         // array
         json::var array("[]");

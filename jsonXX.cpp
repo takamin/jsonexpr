@@ -211,7 +211,7 @@ namespace json {
     {
         switch(this->getType()) {
             case TypeArray:
-                return this->operator[]((double)key);
+                return this->operator[]((int)((double)key));
                 break;
             case TypeObject:
                 return this->operator[]((const string&)key);
