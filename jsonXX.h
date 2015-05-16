@@ -27,6 +27,7 @@ namespace json {
         public:
             var();
             var(const std::string& json);
+            var(const var& var);
             virtual ~var();
             void parse(std::istream& is);
             Type getType() const;

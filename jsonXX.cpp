@@ -17,6 +17,11 @@ namespace json {
         istringstream ss(json);
         ss >> *this;
     }
+    var::var(const var& var)
+        : entity(0)
+    {
+        this->assign((var.entity) ? var.entity->clone() : 0);
+    }
     var::~var()
     {
         delete entity;
