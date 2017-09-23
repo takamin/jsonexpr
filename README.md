@@ -1,10 +1,9 @@
 jsonexpr
 =======
 
-とりあえずは、C++でJSONデータを自然に扱うためのライブラリです。
+JSONをC++で自然に扱うために作ったライブラリです。
 
-唯一提供されている json::var クラスのインスタンスが、
-javascript の基本的なデータ型(数値、ブール、文字列、配列、オブジェクト)に相当します。
+json::var クラスのインスタンスが、JavaScript のデータ型(Number, boolean, string, Array, Object)に相当します。
 
 ## データ型
 
@@ -15,7 +14,8 @@ javascript の基本的なデータ型(数値、ブール、文字列、配列�
 
 ## 初期化
 
-コンストラクタにJSON文字列を与えて初期化できます。
+json::var のコンストラクタにJSON文字列を与えて初期化できます。
+プリミティブ型ではあとで説明していますが、代入するほうが直感的かも知れませんね。
 
 ```
 //数値の初期化(内部表現は全てdouble)
@@ -194,3 +194,10 @@ javascriptの仕様に完全準拠しているわけではありません。
     num["arr"][1] = "change by reference";
     cout << num["arr"][1] << endl;
 ```
+
+LICENSE
+-------
+
+このソフトウェアは、MIT ライセンスにて、提供します。[LICENSE](LICENSE) を参照下さい。
+
+This software is released under the MIT License, see [LICENSE](LICENSE)
